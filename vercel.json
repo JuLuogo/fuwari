@@ -49,6 +49,11 @@
       "source": "/iku",
       "destination": "https://ikuuu.de/auth/register?code=Bjou",
       "permanent": false
+    },
+    {
+      "source": "/donate",
+      "destination": "/sponsors",
+      "permanent": false
     }
   ]
 }
