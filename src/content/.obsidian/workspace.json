@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "posts/hook-steam-drm.md",
+                "file": "posts/zte-f450-bridge.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "hook-steam-drm"
+              "title": "zte-f450-bridge"
             }
           }
         ]
@@ -171,21 +171,23 @@
   },
   "active": "96b79d1156396696",
   "lastOpenFiles": [
-    "posts/163-free-domain-email.md",
+    "assets/images/zte-f450-bridge-4.png",
+    "assets/images/zte-f450-bridge-3.png",
+    "assets/images/zte-f450-bridge-2.png",
+    "assets/images/zte-f450-bridge-1.png",
+    "assets/images/zte-f450-bridge.png",
     "posts/hook-steam-drm.md",
+    "posts/zte-f450-bridge.md",
+    "posts/163-free-domain-email.md",
     "assets/images/VMWSQyHhF5.gif",
     "assets/images/hook-steam-drm-6.png",
     "assets/images/hook-steam-drm-5.png",
     "assets/images/hook-steam-drm-4.png",
     "assets/images/hook-steam-drm-3.png",
     "assets/images/hook-steam-drm-2.png",
-    "assets/images/hook-steam-drm-1.png",
-    "assets/images/hook-steam-drm.png",
     "posts/index-tts2.md",
     "posts/rvc.md",
     "posts/replay.md",
-    "assets/images/rvc-19.png",
-    "assets/images/rvc-18.png",
     "posts/first-pc.md",
     "posts/pin.md",
     "posts/static-view.md",
