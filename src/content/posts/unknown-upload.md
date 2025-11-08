@@ -9,6 +9,9 @@ tags:
 draft: false
 lang: ""
 ---
+# 视频
+https://www.bilibili.com/video/BV1Hz1DBZEov/
+
 # 明确需求
 
 在做一个项目时，无论大小，首先我们要知道自己需要什么，哪些是刚需，哪些是次要的，哪些是根本不必要的
