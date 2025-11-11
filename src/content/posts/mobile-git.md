@@ -1,7 +1,7 @@
 ---
 category: 随笔
 description: 在桌面端，我们可以使用vsc+obsidian来写文章，那么在手机上呢？
-draft: true
+draft: false
 image: ../assets/images/Screenshot_2025-11-11-14-04-23-56_a2e3670364a4153bdb03dad30c8d4108.jpg
 lang: ""
 published: 2025-11-11
