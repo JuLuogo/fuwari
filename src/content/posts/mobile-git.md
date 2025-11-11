@@ -6,6 +6,8 @@ image: ../assets/images/Screenshot_2025-11-11-14-04-23-56_a2e3670364a4153bdb03da
 lang: ""
 published: 2025-11-11
 tags:
+  - Git
+  - 博客
 title: 如何在安卓手机上优雅的写我的博客
 ---
 # 正式开始
