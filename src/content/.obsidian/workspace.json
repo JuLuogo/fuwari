@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "posts/onedrive-index.md",
+                "file": "posts/ms-e3.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "onedrive-index"
+              "title": "ms-e3"
             }
           }
         ]
@@ -171,8 +171,8 @@
   },
   "active": "96b79d1156396696",
   "lastOpenFiles": [
-    "posts/oci.md",
     "posts/onedrive-index.md",
+    "posts/oci.md",
     "assets/images/onedrive-index-7.png",
     "assets/images/onedrive-index-6.png",
     "assets/images/onedrive-index-5.png",
