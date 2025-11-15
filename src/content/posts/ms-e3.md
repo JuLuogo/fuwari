@@ -32,7 +32,7 @@ lang: ""
 分配给你主账户
 ![](../assets/images/ms-e3-3.png)
 
-你已经可以用1T OneDrive了，进入 [My Apps](https://myapplications.microsoft.com/) 选择OneDrive（如果进不去，未知错误，请等等，微软正在帮你初始化OneDrive）
+你已经可以用1T OneDrive了，进入 [My Apps](https://myapplications.microsoft.com/) 选择OneDrive（如果进不去，或者根本没有OneDrive应用，可以直接使用 `https://你的组织名-my.sharepoint.com/my` 尝试访问，记得开梯子）
 ![](../assets/images/ms-e3-4.png)
 
 接下来我们来扩容
