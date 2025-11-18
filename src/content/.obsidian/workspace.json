@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "posts/ms-e3.md",
+                "file": "posts/swup-js.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "ms-e3"
+              "title": "swup-js"
             }
           }
         ]
@@ -171,6 +171,12 @@
   },
   "active": "96b79d1156396696",
   "lastOpenFiles": [
+    "assets/images/swup-js-2.png",
+    "assets/images/swup-js-1.png",
+    "posts/static-view.md",
+    "posts/swup-js.md",
+    "assets/images/swup-js.png",
+    "posts/ms-e3.md",
     "posts/onedrive-index.md",
     "posts/oci.md",
     "assets/images/onedrive-index-7.png",
@@ -181,11 +187,8 @@
     "assets/images/onedrive-index-2.png",
     "assets/images/onedrive-index-1.png",
     "assets/images/onedrive-index.png",
-    "posts/ms-e3.md",
     "posts/wx-zfb-card.md",
     "posts/mobile-git.md",
-    "assets/images/Screenshot_2025-11-11-14-18-53-34_51606159b24eff83e24a54116878fe3e.jpg",
-    "assets/images/Screenshot_2025-11-11-14-17-32-08_51606159b24eff83e24a54116878fe3e.jpg",
     "posts/check-notebook.md",
     "posts/unknown-upload.md",
     "posts/zte-f450-bridge.md",
@@ -196,7 +199,6 @@
     "posts/replay.md",
     "posts/first-pc.md",
     "posts/pin.md",
-    "posts/static-view.md",
     "posts/new-nas.md",
     "posts/manosaba-unzip.md",
     "posts/mac-gal.md",
@@ -204,7 +206,6 @@
     "posts/mac.md",
     "posts/obsidian.md",
     "posts/acg-randompic-api.md",
-    "posts/未命名.md",
-    "未命名.md"
+    "posts/未命名.md"
   ]
 }
