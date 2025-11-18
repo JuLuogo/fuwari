@@ -3,6 +3,7 @@ import { Icon } from "astro-icon/components";
 
 import { getDir, url } from "../utils/url-utils";
 import { formatDateToYYYYMMDD } from "../utils/date-utils";
+import { umamiConfig, statsConfig } from "../config";
  
 
 interface Props {
@@ -62,8 +63,76 @@ const className = Astro.props.class;
                 </a>
             ))}
             {!(tags && tags.length > 0) && <div class="transition text-50 text-sm font-medium">无标签</div>}
-        </div>
+    </div>
     </div>
 
-    
+    <!-- page views -->
+    {slug && (
+        <div class="flex items-center">
+            <div class="meta-icon">
+                <Icon name="material-symbols:visibility-outline-rounded" class="text-xl"></Icon>
+            </div>
+            <span class="text-50 text-sm font-medium" id="page-views-display">{statsConfig.loadingText}</span>
+        </div>
+    )}
 </div>
+
+{slug && (
+    <script define:vars={{ slug, umamiConfig, unavailableText: statsConfig.unavailableText, viewsText: statsConfig.viewsText, visitsText: statsConfig.visitsText }}>
+        function generateStatsText(pageViews, visits) {
+            return `${viewsText} ${pageViews} · ${visitsText} ${visits}`;
+        }
+
+        async function fetchShareData() {
+            const shareUrl = `${umamiConfig.baseUrl}/analytics/us/api/share/${umamiConfig.shareId}`;
+            const resp = await fetch(shareUrl);
+            if (!resp.ok) throw new Error('获取分享数据失败');
+            return await resp.json(); // 期望 { websiteId, token }
+        }
+
+        async function fetchPageViews(isRetry = false) {
+            if (!umamiConfig.enable) return;
+
+            const displayElement = document.getElementById('page-views-display');
+            try {
+                let { websiteId, token } = await fetchShareData();
+                const currentTimestamp = Date.now();
+                const pagePathEncoded = encodeURIComponent(`/posts/${slug}/`);
+                let statsUrl = `${umamiConfig.baseUrl}/analytics/us/api/websites/${websiteId}/stats?startAt=0&endAt=${currentTimestamp}&unit=hour&timezone=${encodeURIComponent(umamiConfig.timezone)}&path=eq.${pagePathEncoded}&compare=false`;
+
+                let statsResponse = await fetch(statsUrl, {
+                    headers: { 'x-umami-share-token': token }
+                });
+
+                if (!statsResponse.ok) {
+                    if (statsResponse.status === 401 && !isRetry) {
+                        const retryShare = await fetchShareData();
+                        websiteId = retryShare.websiteId;
+                        token = retryShare.token;
+                        statsUrl = `${umamiConfig.baseUrl}/analytics/us/api/websites/${websiteId}/stats?startAt=0&endAt=${currentTimestamp}&unit=hour&timezone=${encodeURIComponent(umamiConfig.timezone)}&path=eq.${pagePathEncoded}&compare=false`;
+                        statsResponse = await fetch(statsUrl, {
+                            headers: { 'x-umami-share-token': token }
+                        });
+                    } else {
+                        throw new Error('获取统计数据失败');
+                    }
+                }
+
+                const statsData = await statsResponse.json();
+                const pageViews = statsData.pageviews || 0;
+                const visits = statsData.visitors || 0;
+
+                if (displayElement) displayElement.textContent = generateStatsText(pageViews, visits);
+            } catch (error) {
+                console.error('Error fetching page views:', error);
+                if (displayElement) displayElement.textContent = unavailableText;
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => fetchPageViews(false));
+        } else {
+            fetchPageViews(false);
+        }
+    </script>
+)}

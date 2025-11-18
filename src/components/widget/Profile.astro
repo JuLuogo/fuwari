@@ -1,6 +1,6 @@
 ---
 import { Icon } from "astro-icon/components";
-import { profileConfig } from "../../config";
+import { profileConfig, umamiConfig, statsConfig } from "../../config";
 import { url } from "../../utils/url-utils";
 import ImageWrapper from "../misc/ImageWrapper.astro";
 
@@ -34,8 +34,69 @@ const config = profileConfig;
                 {config.links[0].name}
             </a>}
         </div>
-        
-        
+
+        <!-- 全站访问量统计 -->
+        <div class="text-center text-sm text-neutral-500 dark:text-neutral-400 mt-3 pt-3 border-t border-neutral-200 dark:border-neutral-700">
+            <div class="flex items-center justify-center gap-1">
+                <Icon name="material-symbols:visibility-outline" class="text-base"></Icon>
+                <span id="site-stats">{statsConfig.loadingText}</span>
+            </div>
+        </div>
     </div>
 </div>
+
+<script define:vars={{ umamiConfig, unavailableText: statsConfig.unavailableText, viewsText: statsConfig.viewsText, visitsText: statsConfig.visitsText }}>
+    function generateStatsText(pageViews, visits) {
+        return `${viewsText} ${pageViews} · ${visitsText} ${visits}`;
+    }
+
+    async function fetchShareData() {
+        const shareUrl = `${umamiConfig.baseUrl}/analytics/us/api/share/${umamiConfig.shareId}`;
+        const resp = await fetch(shareUrl);
+        if (!resp.ok) throw new Error('获取分享数据失败');
+        return await resp.json(); // { websiteId, token }
+    }
+
+    async function loadSiteStats() {
+        if (!umamiConfig.enable) return;
+
+        const statsElement = document.getElementById('site-stats');
+        try {
+            let { websiteId, token } = await fetchShareData();
+            const currentTimestamp = Date.now();
+            let statsUrl = `${umamiConfig.baseUrl}/analytics/us/api/websites/${websiteId}/stats?startAt=0&endAt=${currentTimestamp}&unit=hour&timezone=${encodeURIComponent(umamiConfig.timezone)}&compare=false`;
+
+            let statsResponse = await fetch(statsUrl, {
+                headers: { 'x-umami-share-token': token }
+            });
+
+            if (statsResponse.status === 401) {
+                const retryShare = await fetchShareData();
+                websiteId = retryShare.websiteId;
+                token = retryShare.token;
+                statsUrl = `${umamiConfig.baseUrl}/analytics/us/api/websites/${websiteId}/stats?startAt=0&endAt=${currentTimestamp}&unit=hour&timezone=${encodeURIComponent(umamiConfig.timezone)}&compare=false`;
+                statsResponse = await fetch(statsUrl, {
+                    headers: { 'x-umami-share-token': token }
+                });
+            }
+
+            if (!statsResponse.ok) throw new Error('获取统计数据失败');
+
+            const statsData = await statsResponse.json();
+            const pageviews = statsData.pageviews || 0;
+            const visitors = statsData.visitors || 0;
+
+            if (statsElement) statsElement.textContent = generateStatsText(pageviews, visitors);
+        } catch (error) {
+            console.error('获取全站统计失败:', error);
+            if (statsElement) statsElement.textContent = unavailableText;
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', loadSiteStats);
+    } else {
+        loadSiteStats();
+    }
+</script>
 
