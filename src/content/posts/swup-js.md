@@ -36,4 +36,5 @@ lang: ""
 - https://umami.2b2x.cn/analytics/us/api/websites/5d710dbd-3a2e-43e3-a553-97b415090c63/stats?startAt=0&endAt=1763429243350&unit=hour&timezone=Asia%2FShanghai&path=eq.%2Fposts%2Fswup-js%2F&compare=false ：获取本页统计信息
 - 两个预检：由于CORS，请求源和被请求源不一致，这是浏览器自带的安全策略，实际顺序为 先预检（我不属于你？我能不能访问你？） - 再fetch（我允许你，访问吧） 。题外话：为什么需要预检？因为浏览器要确保该请求是对方明确允许的，而不是恶意网站强行访问的，否则会触发 **CSRF** 攻击，也就是对端源安全策略过于宽松，导致谁都能拿到信息，这些信息可能是敏感的（如登录Token，用户名与密码等）
 - https://api-gateway.umami.dev/api/send ：Umami的官方JS，用于将本次访问的行为汇报给Umami
+
 问题已被完美解决！无冗余请求，干净利落
