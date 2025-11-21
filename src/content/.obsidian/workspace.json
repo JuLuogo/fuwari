@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "posts/why-not-icp.md",
+                "file": "posts/warden-worker.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "why-not-icp"
+              "title": "warden-worker"
             }
           }
         ]
@@ -171,22 +171,25 @@
   },
   "active": "96b79d1156396696",
   "lastOpenFiles": [
+    "assets/images/Screenshot_2025-11-21-18-32-58-31_edf9c6c5202cf0a.jpg",
+    "assets/images/Screenshot_2025-11-21-17-53-34-66_edf9c6c5202cf0a.jpg",
+    "assets/images/Screenshot_2025-11-21-17-53-04-92_edf9c6c5202cf0a.jpg",
+    "assets/images/Screenshot_2025-11-21-17-53-07-65_edf9c6c5202cf0a.jpg",
+    "assets/images/warden-worker-20.png",
+    "assets/images/warden-worker-19.png",
+    "assets/images/warden-worker-18.png",
+    "assets/images/warden-worker-17.png",
+    "assets/images/warden-worker-16.png",
+    "assets/images/warden-worker-15.png",
+    "assets/images/warden-worker-14.png",
+    "posts/why-not-icp.md",
+    "posts/warden-worker.md",
     "posts/ipfs.md",
     "posts/swup-js.md",
-    "assets/images/swup-js-2.png",
-    "assets/images/swup-js-1.png",
     "posts/static-view.md",
-    "assets/images/swup-js.png",
     "posts/ms-e3.md",
     "posts/onedrive-index.md",
     "posts/oci.md",
-    "assets/images/onedrive-index-7.png",
-    "assets/images/onedrive-index-6.png",
-    "assets/images/onedrive-index-5.png",
-    "assets/images/onedrive-index-4.png",
-    "assets/images/onedrive-index-3.png",
-    "assets/images/onedrive-index-2.png",
-    "assets/images/onedrive-index-1.png",
     "posts/wx-zfb-card.md",
     "posts/mobile-git.md",
     "posts/check-notebook.md",
@@ -203,9 +206,6 @@
     "posts/manosaba-unzip.md",
     "posts/mac-gal.md",
     "posts/hugo.md",
-    "posts/mac.md",
-    "posts/obsidian.md",
-    "posts/acg-randompic-api.md",
-    "posts/未命名.md"
+    "posts/mac.md"
   ]
 }
