@@ -8,7 +8,7 @@ category: '记录'
 draft: false 
 lang: ''
 ---
-
+> 目前已备案，该文章存档
 # 违规内容
 
 早期本站发布过文章 [点此查看](/posts/bypass-gfw/)
