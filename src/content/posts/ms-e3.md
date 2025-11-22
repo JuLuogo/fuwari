@@ -54,3 +54,6 @@ lang: ""
 
 用刚才讲过的方法进入OneDrive，成功扩容
 ![](../assets/images/ms-e3-10.png)
+
+最后，注意一下，及时前往 [My Sign-Ins | Security Info | Microsoft.com](https://mysignins.microsoft.com/security-info) 绑定更多的安全信息，避免日后无法访问账号
+![](../assets/images/e4d124d4c11d25813b40a984b6c15465.png)

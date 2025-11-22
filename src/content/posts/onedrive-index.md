@@ -43,3 +43,10 @@ Vercel部署完毕后，会报错连不上Redis，因为我们还没创建和绑
 
 成功部署！
 ![](../assets/images/onedrive-index-7.png)
+
+# 同项目更改OneDrive账号
+首先在Vercel上更改这三个环境变量
+![](../assets/images/onedrive-index-8.png)
+
+然后打开 Upstash 找到对应的Redis，删除里面存储的所有Token
+![](../assets/images/onedrive-index-9.png)
