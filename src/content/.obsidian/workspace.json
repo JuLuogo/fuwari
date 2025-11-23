@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "posts/ms-e3.md",
+                "file": "posts/lskypro-local.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "ms-e3"
+              "title": "lskypro-local"
             }
           }
         ]
@@ -171,6 +171,7 @@
   },
   "active": "96b79d1156396696",
   "lastOpenFiles": [
+    "posts/ms-e3.md",
     "assets/images/e4d124d4c11d25813b40a984b6c15465.png",
     "posts/onedrive-index.md",
     "assets/images/onedrive-index-9.png",
@@ -183,12 +184,10 @@
     "assets/images/warden-worker-20.png",
     "assets/images/warden-worker-19.png",
     "assets/images/warden-worker-18.png",
-    "assets/images/warden-worker-17.png",
     "posts/why-not-icp.md",
     "posts/ipfs.md",
     "posts/swup-js.md",
     "posts/static-view.md",
-    "posts/ms-e3.md",
     "posts/oci.md",
     "posts/wx-zfb-card.md",
     "posts/mobile-git.md",
