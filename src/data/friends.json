@@ -479,6 +479,12 @@
       "avatar": "https://zhongzhong.space/wp-content/uploads/2025/11/avatar.webp",
       "description": "小白的半成品拼好站",
       "url": "https://zhongzhong.space"
+    },
+    {
+      "name": "Clina's Blog",
+      "avatar": "https://codeberg.org/Clina/fuwari/raw/branch/main/public/photos/photo1.png",
+      "description": "Clina的Blog",
+      "url": "https://clina.webn.cc"
     }
   ]
 }
