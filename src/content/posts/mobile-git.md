@@ -18,6 +18,14 @@ title: 如何在安卓手机上优雅的写我的博客
 安装之后，点击右上角的加号，点击克隆，即可克隆仓库
 ![](../assets/images/Screenshot_2025-11-11-14-11-13-56_a2e3670364a4153bdb03dad30c8d4108.jpg)
 
+创建Github Token
+![](../assets/images/Screenshot_2025-11-24-07-55-54-35_df198e732186825c8df26e3c5a10d7cd%201.jpg)
+
+将其添加到小狗Git
+![](../assets/images/Screenshot_2025-11-24-07-56-23-48_a2e3670364a4153bdb03dad30c8d4108%201.jpg)
+
+链接仓库![](../assets/images/Screenshot_2025-11-24-07-56-33-62_a2e3670364a4153bdb03dad30c8d4108.jpg)
+
 当你修改好后，点击 **需要提交** 按钮，进入提交界面
 ![](../assets/images/Screenshot_2025-11-11-14-11-59-16_a2e3670364a4153bdb03dad30c8d4108.jpg)
 
