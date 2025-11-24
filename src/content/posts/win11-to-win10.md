@@ -86,7 +86,11 @@ Win11有但Win10没有的东西会消失，两者都有的会保留。专为Win1
 
 接下来你第一次开机可能会黑屏。表现为用户登录后随着一声警告声并且黑屏，此时移动鼠标可以看到光标移动，但无法点击屏幕上的任何元素
 
-进入其他系统（如U盘中的PE系统），删除所有 `C:\ProgramData\Microsoft\Windows\AppRepository\StateRepository-开头的文件` 
+进入其他系统（如U盘中的PE系统），删除所有 
+```
+C:\ProgramData\Microsoft\Windows\AppRepository\StateRepository-开头的文件
+```
+
 
 再次开机，应该可以成功开机了
 
