@@ -291,7 +291,7 @@ var _hmt = _hmt || [];
 		<div id="page-height-extend" class="hidden h-[300vh]"></div>
 
 		<!-- 域名检测脚本 -->
-		<script is:inline define:vars={{officialSites: ["https://2x.nz", "https://blog.2b2x.cn", "https://b.2.f.f.0.7.4.0.1.0.0.2.ip6.arpa"]}}>
+		<script is:inline define:vars={{officialSites: siteConfig.officialSites || []}}>
 			// 域名检测功能
 			function checkDomain() {
 				try {
@@ -303,7 +303,8 @@ var _hmt = _hmt || [];
 					// 获取所有官方域名
 					const officialDomains = officialSites.map(site => {
 						try {
-							return new URL(site).hostname;
+                            const url = typeof site === 'string' ? site : site.url;
+							return new URL(url).hostname;
 						} catch (e) {
 							return null;
 						}
@@ -329,7 +330,9 @@ var _hmt = _hmt || [];
 						if (shouldRedirect) {
 							// 构建官方网站的对应页面URL（使用第一个官方网站）
 							const currentPath = window.location.pathname + window.location.search + window.location.hash;
-							const officialPageUrl = officialSites[0] + currentPath;
+                            const firstSite = officialSites[0];
+                            const firstUrl = typeof firstSite === 'string' ? firstSite : firstSite.url;
+							const officialPageUrl = firstUrl + currentPath;
 							// 跳转到官方网站
 							window.location.href = officialPageUrl;
 						}
