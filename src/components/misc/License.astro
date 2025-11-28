@@ -21,7 +21,7 @@ const postUrl = decodeURIComponent(Astro.url.toString());
     <div class="transition font-bold text-black/75 dark:text-white/75">
         {title}
     </div>
-    <a href={postUrl} class="link text-[var(--primary)]">
+    <a href={postUrl} class="license-url link text-[var(--primary)]">
         {postUrl}
     </a>
     <div class="flex gap-6 mt-2">
@@ -40,3 +40,29 @@ const postUrl = decodeURIComponent(Astro.url.toString());
     </div>
     <Icon name="fa6-brands:creative-commons" class="transition text-[15rem] absolute pointer-events-none right-6 top-1/2 -translate-y-1/2 text-black/5 dark:text-white/5"></Icon>
 </div>
+
+<script>
+    function updateLicenseUrl() {
+        const licenseUrls = document.querySelectorAll('.license-url');
+        if (licenseUrls.length === 0) return;
+        const currentUrl = decodeURIComponent(window.location.href);
+        licenseUrls.forEach(link => {
+            link.setAttribute('href', currentUrl);
+            link.textContent = currentUrl;
+        });
+    }
+
+    const setup = () => {
+        updateLicenseUrl();
+        // @ts-ignore
+        window.swup.hooks.on("page:view", updateLicenseUrl);
+    }
+
+    // @ts-ignore
+    if (window.swup) {
+        setup();
+    } else {
+        document.addEventListener("swup:enable", setup);
+    }
+</script>
+
