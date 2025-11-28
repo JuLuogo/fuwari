@@ -113,6 +113,7 @@ const officialSites = siteConfig.officialSites || [];
                 const timeoutId = setTimeout(() => controller.abort(), 5000);
                 
                 await fetch(url, { 
+                    method: 'HEAD',
                     mode: 'no-cors', 
                     cache: 'no-store',
                     signal: controller.signal
@@ -168,4 +169,5 @@ const officialSites = siteConfig.officialSites || [];
         testLatency();
     });
 </script>
+
 
