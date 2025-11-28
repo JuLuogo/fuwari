@@ -21,7 +21,7 @@ const postUrl = decodeURIComponent(Astro.url.toString());
     <div class="transition font-bold text-black/75 dark:text-white/75">
         {title}
     </div>
-    <a href={postUrl} class="license-url link text-[var(--primary)]">
+    <a href={postUrl} class="license-url link text-[var(--primary)] opacity-0 transition-opacity">
         {postUrl}
     </a>
     <div class="flex gap-6 mt-2">
@@ -43,26 +43,14 @@ const postUrl = decodeURIComponent(Astro.url.toString());
 
 <script>
     function updateLicenseUrl() {
-        const licenseUrls = document.querySelectorAll('.license-url');
-        if (licenseUrls.length === 0) return;
-        const currentUrl = decodeURIComponent(window.location.href);
-        licenseUrls.forEach(link => {
-            link.setAttribute('href', currentUrl);
-            link.textContent = currentUrl;
+        const links = document.querySelectorAll('.license-url');
+        links.forEach(link => {
+            const url = decodeURIComponent(window.location.href);
+            link.setAttribute('href', url);
+            link.textContent = url;
+            link.classList.remove('opacity-0');
         });
     }
-
-    const setup = () => {
-        updateLicenseUrl();
-        // @ts-ignore
-        window.swup.hooks.on("page:view", updateLicenseUrl);
-    }
-
-    // @ts-ignore
-    if (window.swup) {
-        setup();
-    } else {
-        document.addEventListener("swup:enable", setup);
-    }
+    updateLicenseUrl();
+    document.addEventListener('astro:page-load', updateLicenseUrl);
 </script>
-
