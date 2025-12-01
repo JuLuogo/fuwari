@@ -485,6 +485,24 @@
       "avatar": "https://text03.com/avatar",
       "description": "如果生活把你推到了板边，记得升龙 →↓↘+👊",
       "url": "https://text03.com"
+    },
+    {
+      "name": "ノート of 我",
+      "avatar": "https://avatars.githubusercontent.com/u/29329988",
+      "description": "一个简单的笔记",
+      "url": "https://note-of-me.top"
+    },
+    {
+      "name": "Clina's Blog",
+      "avatar": "https://codeberg.org/Clina/fuwari/raw/branch/main/public/photos/photo1.png",
+      "description": "Clina的Blog",
+      "url": "https://clina.webn.cc"
+    },
+    {
+      "name": "Starlr blog",
+      "avatar": "https://q2.qlogo.cn/headimg_dl?dst_uin=3385016019&spec=5",
+      "description": "懒得写文章喵",
+      "url": "https://www.xc-lr.cn"
     }
   ]
 }

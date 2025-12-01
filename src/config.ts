@@ -138,6 +138,7 @@ export const gitHubEditConfig: GitHubEditConfig = {
 	baseUrl: "https://github.com/afoim/fuwari/blob/main/src/content/posts",
 };
 
+// todoConfig removed from here
 
 export const statsConfig = {
 	viewsText: "浏览",
