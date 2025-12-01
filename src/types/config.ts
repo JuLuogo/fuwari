@@ -38,6 +38,7 @@ export type SiteConfig = {
 	};
 
 	favicon: Favicon[];
+	officialSites?: (string | { url: string; alias: string })[];
 };
 
 export type Favicon = {
@@ -90,6 +91,17 @@ export type UmamiConfig = {
 	baseUrl: string;
 	shareId: string;
 	timezone: string;
+};
+
+export type TodoItem = {
+    content: string;
+    completed: boolean;
+};
+
+export type TodoConfig = {
+    enable: boolean;
+    title: string;
+    items: TodoItem[];
 };
 
 export type LIGHT_DARK_MODE =

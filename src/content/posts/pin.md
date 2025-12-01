@@ -1,10 +1,11 @@
 ---
-title: "加群向导"
-image: https://eopfapi.2b2x.cn/pic?img=ua
+title: 加群向导
+image: https://eopfapi.b.2.f.f.0.7.4.0.1.0.0.2.ip6.arpa/ri/h/622.webp
 published: 2025-05-24
 pinned: true
-category: '置顶'
-tags: [联系]
+category: 置顶
+tags:
+  - 联系
 description: 关于如何联系二叉树树~
 ---
 

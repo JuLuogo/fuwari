@@ -33,13 +33,22 @@ export default defineConfig({
       image: {
     service: passthroughImageService()
   },
-    site: "https://blog.2b2x.cn",
+    site: "https://2x.nz",
     base: "/",
     trailingSlash: "always",
     output: "static",
     redirects: {
       "/donate": "/sponsors",
-      "/donate/": "/sponsors/"
+      "/ak": "https://akile.io/register?aff_code=503fe5ea-e7c5-4d68-ae05-6de99513680e",
+      "/kook": "https://kook.vip/K29zpT",
+      "/long": "https://iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii.iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii.in/",
+      "/mly": "https://muleyun.com/aff/GOTRJLPN",
+      "/tg": "https://t.me/+_07DERp7k1ljYTc1",
+      "/tit": "/posts/pin/",
+      "/tly": "https://tianlicloud.cn/aff/HNNCFKGP",
+      "/wly": "https://wl.awcmam.com/#/register?code=FNQwOQBM",
+      "/yyb": "https://www.rainyun.com/acofork_?s=bilibili",
+      "/iku": "https://ikuuu.de/auth/register?code=Bjou"
     },
     integrations: [tailwind({
         nesting: true,

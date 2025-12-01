@@ -37,7 +37,7 @@ export const siteConfig: SiteConfig = {
 	},
 	background: {
 		enable: true, // Enable background image
-		src: "https://eopfapi.2b2x.cn/pic?img=ua", // Background image URL (supports HTTPS)
+		src: "https://eopfapi.b.2.f.f.0.7.4.0.1.0.0.2.ip6.arpa/pic?img=ua", // Background image URL (supports HTTPS)
 		position: "center", // Background position: 'top', 'center', 'bottom'
 		size: "cover", // Background size: 'cover', 'contain', 'auto'
 		repeat: "no-repeat", // Background repeat: 'no-repeat', 'repeat', 'repeat-x', 'repeat-y'
@@ -55,6 +55,12 @@ export const siteConfig: SiteConfig = {
 			//   theme: 'light',              // (Optional) Either 'light' or 'dark', set only if you have different favicons for light and dark mode
 			//   sizes: '32x32',              // (Optional) Size of the favicon, set only if you have favicons of different sizes
 		},
+	],
+	officialSites: [
+		{ url: "https://2x.nz", alias: "Vercel" },
+		{ url: "https://blog.2b2x.cn", alias: "备案域" },
+		{ url: "https://b.2.f.f.0.7.4.0.1.0.0.2.ip6.arpa", alias: "漏网之鱼" },
+		{ url: "http://localhost:4321", alias: "Dev" }
 	],
 };
 
@@ -112,13 +118,13 @@ export const licenseConfig: LicenseConfig = {
 
 export const imageFallbackConfig: ImageFallbackConfig = {
 	enable: true,
-	originalDomain: "eo-r2.2x.nz",
-	fallbackDomain: "pub-d433ca7edaa74994b3d7c40a7fd7d9ac.r2.dev",
+	originalDomain: "eopfapi.2b2x.cn",
+	fallbackDomain: "eopfapi.b.2.f.f.0.7.4.0.1.0.0.2.ip6.arpa/pic?img=ua",
 };
 
 export const umamiConfig: UmamiConfig = {
 	enable: true,
-	baseUrl: "https://umami.2b2x.cn",
+	baseUrl: "https://cloud.umami.is",
 	shareId: "hN3l7PGcxsUCBHfU",
 	timezone: "Asia/Shanghai",
 };
@@ -132,6 +138,7 @@ export const gitHubEditConfig: GitHubEditConfig = {
 	baseUrl: "https://github.com/afoim/fuwari/blob/main/src/content/posts",
 };
 
+// todoConfig removed from here
 
 export const statsConfig = {
 	viewsText: "浏览",
