@@ -93,6 +93,17 @@ export type UmamiConfig = {
 	timezone: string;
 };
 
+export type TodoItem = {
+    content: string;
+    completed: boolean;
+};
+
+export type TodoConfig = {
+    enable: boolean;
+    title: string;
+    items: TodoItem[];
+};
+
 export type LIGHT_DARK_MODE =
 	| typeof LIGHT_MODE
 	| typeof DARK_MODE

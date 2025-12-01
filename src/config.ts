@@ -60,6 +60,7 @@ export const siteConfig: SiteConfig = {
 		{ url: "https://2x.nz", alias: "Vercel" },
 		{ url: "https://blog.2b2x.cn", alias: "备案域" },
 		{ url: "https://b.2.f.f.0.7.4.0.1.0.0.2.ip6.arpa", alias: "漏网之鱼" },
+		{ url: "http://localhost:4321", alias: "Dev" }
 	],
 };
 
@@ -137,6 +138,7 @@ export const gitHubEditConfig: GitHubEditConfig = {
 	baseUrl: "https://github.com/afoim/fuwari/blob/main/src/content/posts",
 };
 
+// todoConfig removed from here
 
 export const statsConfig = {
 	viewsText: "浏览",

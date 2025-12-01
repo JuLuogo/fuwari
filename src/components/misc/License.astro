@@ -21,9 +21,18 @@ const postUrl = decodeURIComponent(Astro.url.toString());
     <div class="transition font-bold text-black/75 dark:text-white/75">
         {title}
     </div>
-    <a href={postUrl} class="link text-[var(--primary)]">
-        {postUrl}
-    </a>
+
+    <a id="current-link" style="display:none;" class="link text-[var(--primary)]"></a>
+
+    <script>
+    const currentLink = document.getElementById('current-link');
+    const url = window.location.href;
+
+    currentLink.textContent = url;  // 显示文本 = 当前 URL
+    currentLink.href = url;         // 点击跳转 = 当前 URL
+    currentLink.style.display = 'inline'; // 显示出来
+    </script>
+
     <div class="flex gap-6 mt-2">
         <div>
             <div class="transition text-black/30 dark:text-white/30 text-sm">作者</div>
@@ -40,3 +49,5 @@ const postUrl = decodeURIComponent(Astro.url.toString());
     </div>
     <Icon name="fa6-brands:creative-commons" class="transition text-[15rem] absolute pointer-events-none right-6 top-1/2 -translate-y-1/2 text-black/5 dark:text-white/5"></Icon>
 </div>
+
+
