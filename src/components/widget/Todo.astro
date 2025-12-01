@@ -1,0 +1,35 @@
+---
+import { todoConfig } from "@/data/todo";
+import WidgetLayout from "./WidgetLayout.astro";
+import { Icon } from "astro-icon/components";
+
+interface Props {
+	class?: string;
+	style?: string;
+}
+const className = Astro.props.class;
+const style = Astro.props.style;
+---
+
+{todoConfig.enable && (
+    <WidgetLayout name={todoConfig.title} id="todo-list" class={className} style={style}>
+        <div class="flex flex-col gap-2">
+            {todoConfig.items.map((item) => (
+                <div class="flex items-center gap-2 text-sm text-neutral-700 dark:text-neutral-300">
+                    <Icon 
+                        name={item.completed ? "material-symbols:check-box-outline" : "material-symbols:check-box-outline-blank"} 
+                        class={`text-lg flex-shrink-0 ${item.completed ? "text-[var(--primary)]" : "text-neutral-400"}`} 
+                    />
+                    <span class={item.completed ? "line-through opacity-60" : ""}>{item.content}</span>
+                </div>
+            ))}
+        </div>
+        <div class="mt-4 flex justify-center">
+            <a href="https://github.com/afoim/fuwari/tree/main/src/data/todo.ts" target="_blank" rel="noopener noreferrer" class="btn-plain rounded-lg h-9 px-4 flex items-center gap-2 text-[var(--primary)] text-sm">
+                <Icon name="material-symbols:add-task-rounded" class="text-lg" />
+                我要给你加工作！
+            </a>
+        </div>
+    </WidgetLayout>
+)}
+
