@@ -83,6 +83,11 @@ Serverless也比Server更容易做版本控制和Debug，由于Serverless和Git�
 之前被干爆过，目前亚太爆炸，每个月有 **5 美元** 余额，直接跑Docker，按你分配的CPU核心数和内存来计费。不过 Hobby 计划还蛮便宜的，常用的话可以买
 ![](../assets/images/serverless-function-2.png)
 
+### [Render](https://render.com/)
+![](../assets/images/serverless-function-3.png)
+**每月免费100G流量**，支持非常多的服务，如：静态网站、Web服务（Docker）、定时服务、PostgreSQL数据库、Key Vaule存储
+
+唯一的缺点，性能不高
 
 # 结语
 Serverless不像传统的VPS，你并不完全拥有它，所以有些服务是不能跑的， **特别是在免费层** ，如特别吃IO和网络的 **AList** ，或是并发请求特别高以及商用服务。如果你用的舒心，请考虑购买各大平台的付费版套餐
