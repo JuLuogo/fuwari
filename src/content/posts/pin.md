@@ -1,6 +1,6 @@
 ---
 title: 加群向导
-image: https://eopfapi.b.2.f.f.0.7.4.0.1.0.0.2.ip6.arpa/ri/h/622.webp
+image: https://eopfapi.b.2.f.f.0.7.4.0.1.0.0.2.ip6.arpa/pic?img=ua
 published: 2025-05-24
 pinned: true
 category: 置顶
