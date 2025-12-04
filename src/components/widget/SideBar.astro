@@ -5,6 +5,7 @@ import Profile from "./Profile.astro";
 import Tag from "./Tags.astro";
 import DomainSwitcher from "./DomainSwitcher.astro";
 import Todo from "./Todo.astro";
+import TimeCard from "./TimeCard.astro";
 
 interface Props {
 	class?: string;
@@ -21,6 +22,7 @@ const className = Astro.props.class;
         <DomainSwitcher class="onload-animation" style="animation-delay: 150ms"></DomainSwitcher>
         <Tag class="onload-animation" style="animation-delay: 200ms"></Tag>
         <Todo class="onload-animation" style="animation-delay: 250ms"></Todo>
+        <TimeCard class="onload-animation" style="animation-delay: 300ms"></TimeCard>
                     <!-- 赞助标 -->
         <div class="overflow-hidden flex justify-center">
             <a href="https://secbit.ai/" target="_blank" rel="noopener noreferrer">
@@ -36,5 +38,6 @@ const className = Astro.props.class;
         </div>
     </div>
 </div>
+
 
 
