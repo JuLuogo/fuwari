@@ -57,9 +57,10 @@ export const siteConfig: SiteConfig = {
 		},
 	],
 	officialSites: [
+		{ url: "https://blog.2b2x.cn", alias: "EdgeOne CN" },
 		{ url: "https://2x.nz", alias: "Vercel" },
-		{ url: "https://blog.2b2x.cn", alias: "备案域" },
-		{ url: "https://b.2.f.f.0.7.4.0.1.0.0.2.ip6.arpa", alias: "漏网之鱼" },
+		
+		{ url: "https://b.2.f.f.0.7.4.0.1.0.0.2.ip6.arpa", alias: "Cloudflare" },
 		{ url: "http://localhost:4321", alias: "Dev" }
 	],
 };
