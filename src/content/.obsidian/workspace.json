@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "posts/serverless-function.md",
+                "file": "posts/umami-migration.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "serverless-function"
+              "title": "umami-migration"
             }
           }
         ]
@@ -171,21 +171,22 @@
   },
   "active": "96b79d1156396696",
   "lastOpenFiles": [
-    "assets/images/serverless-function-6.png",
-    "assets/images/serverless-function-5.png",
-    "assets/images/serverless-function-4.png",
-    "assets/images/serverless-function-3.png",
+    "assets/images/umami-migration-15.png",
+    "assets/images/umami-migration-14.png",
+    "assets/images/umami-migration-13.png",
+    "assets/images/umami-migration-12.png",
+    "assets/images/umami-migration-11.png",
+    "assets/images/umami-migration-10.png",
+    "assets/images/umami-migration-9.png",
+    "assets/images/umami-migration-8.png",
+    "assets/images/umami-migration-7.png",
+    "assets/images/umami-migration-6.png",
+    "assets/images/umami-migration-5.png",
+    "posts/serverless-function.md",
+    "posts/umami-migration.md",
     "posts/pin.md",
     "posts/anuneko.md",
-    "assets/images/anuneko-3.png",
-    "assets/images/anuneko-2.png",
-    "assets/images/anuneko-1.png",
-    "assets/images/anuneko.png",
     "posts/win11-to-win10.md",
-    "posts/serverless-function.md",
-    "assets/images/serverless-function-2.png",
-    "assets/images/serverless-function-1.png",
-    "assets/images/serverless-function.png",
     "posts/remote.md",
     "posts/warden-worker.md",
     "posts/expressive-code.md",
@@ -205,7 +206,6 @@
     "posts/hook-steam-drm.md",
     "posts/163-free-domain-email.md",
     "posts/index-tts2.md",
-    "posts/rvc.md",
-    "posts/replay.md"
+    "posts/rvc.md"
   ]
 }
