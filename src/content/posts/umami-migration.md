@@ -36,7 +36,7 @@ lang: ""
 然后连上数据库，你将可以看到这些表
 ![](../assets/images/umami-migration-4.png)
 
-接下来我们查看 `website` 这张表，将 `website_event.csb` 打开，查看旧的 `website_id` 将新的ID改为旧的，这样才能数据匹配
+接下来我们查看 `website` 这张表，将 `website_event.csv` 打开，查看旧的 `website_id` 将新的ID改为旧的，这样才能数据匹配
 ![](../assets/images/umami-migration-5.png)
 ![](../assets/images/umami-migration-6.png)
 
