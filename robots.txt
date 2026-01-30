@@ -1,4 +1,4 @@
 User-agent: *
 Disallow: /_astro/
 
-Sitemap: https://2x.nz/sitemap-index.xml
+Sitemap: https://blog.acofork.com/sitemap-index.xml
