@@ -346,83 +346,83 @@ const umamiConfig = {"enable":true,"baseUrl":"https://u.2x.nz","shareId":"CdkXbG
 仍然是前后端分离，我们现在将逻辑放到一个函数上面，如Cloudflare Worker、EdgeOne Function、Vercel Function等等
 <img  width="1523" height="649" loading="lazy" decoding="async" src="/_astro/random-url-gen-8.D_OerHRI_2pxC30.webp" >
 那么现在是不是无敌了？</p><p>并非，虽然前端因为使用了 <strong>云函数</strong> 也就是直接接入了CDN，高并发已经不是问题了，但是由于资产并不直接托管在 <strong>云函数</strong> 中，<strong>云函数</strong> 仍然需要创建一个长连接从你的后端，如对象存储获取图片，这样一折腾，你的服务可能并不算快</p><p>有人就会说了，那既然现在我都把我服务器丢了，前端在云，后端也在云，为什么不直接让前端的云直接存储后端的资产呢？</p><p>当然可以！你已经非常接近最佳实践了！</p><p>绝大部分 <strong>云函数</strong> 都支持动静结合，也就是支持你在他们的云存放一些动态脚本，再顺便 <strong>存放静态资产</strong></p><p>那么接下来，你就得到了一个完全不需要你买服务器托管，也不需要你担心存储爆仓导致天价账单的随机图…了吗？</p><p><img  width="1222" height="1028" loading="lazy" decoding="async" src="/_astro/random-url-gen-4.pAFl_MLk_Z1Th1VG.webp" ></p></section>
-<section><h1 id="探索随机图随机url的本质">探索随机图（随机URL）的本质<a class="anchor" href="#探索随机图随机url的本质"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h1><p>我们刚刚只是在抽象的说明某种架构 <strong>好像</strong> 可行，<strong>好像</strong> 又有什么问题，然后又有一种什么新思路 <strong>好像</strong> 可以解决这个问题</p><p>但我们要走的路才刚刚开始，我们不妨思考一下，随机图，又或者说随机URL这类项目，服务器（如果有）究竟发送了什么给客户端，客户端又对服务器发回的报文执行了什么动作</p><p>你肯定知道，如果想要客户端每次请求同一个URL，都返回不同的东西，那肯定是服务器针对每一个请求都返回了不同的响应，它可以是内部的，比如直接在响应体塞图片，又或者也可以是 <strong>重定向</strong></p><p>直接在响应体塞图片很简单，在客户端是不可见的，当客户端请求API时，服务器直接将选中的图片作为响应体发出，在客户端看来，就好像是请求了一张图片，只不过每次刷新都不一样</p><p>而响应 <strong>重定向</strong> 就更简单了，只需要让服务器发送一个 <strong>临时重定向</strong> 的状态码，比如 <strong>302</strong></p><p>有人就会说了，为什么必须要 <strong>临时重定向</strong> ？</p><p>因为你肯定是想要客户端每次刷新都返回不同的图，一旦你使用了 <strong>永久重定向</strong> 如 <strong>301</strong> ，客户端在收到 <strong>301</strong> 的那一刻就会在浏览器里写一个记录：<strong>下次访问这个URL直接重定向，不再请求服务器</strong> ，这就会导致你的随机图API真的就变成一张图片了</p><p>那么，这两种方法哪种更好呢？</p><p>各有利弊，一句话说明：<strong>直接返回MIME类型是连请求复用，仅需一次请求即可得到图片。而返回302重定向至少需要客户端请求两次</strong></p><p>这得看你的实际架构，如果说你是前后端分离，即逻辑和资产不在一个地方，肯定是 302 好，因为如果你直接在响应体塞图片，就相当于你的服务器作为 <strong>代理</strong> 让客户端访问你的资产，流量全部走你服务器</p><p>而如果说你前后端都在一起，正常情况下来说，一次请求复用肯定是比两次连接更快的，不过为了方便管理和统计，我的大部分API仍然使用 <strong>302 重定向</strong></p><a id="GC2cwf7g-card" class="card-github fetch-waiting no-styling" href="https://github.com/afoim/EdgeOne_Function_PicAPI" target="_blank" repo="afoim/EdgeOne_Function_PicAPI" rel="nofollow"><div class="gc-titlebar"><div class="gc-titlebar-left"><div class="gc-owner"><div id="GC2cwf7g-avatar" class="gc-avatar"></div><div class="gc-user">afoim</div></div><div class="gc-divider">/</div><div class="gc-repo">EdgeOne_Function_PicAPI</div></div><div class="github-logo"></div></div><div id="GC2cwf7g-description" class="gc-description">Waiting for api.github.com...</div><div class="gc-infobar"><div id="GC2cwf7g-stars" class="gc-stars">00K</div><div id="GC2cwf7g-forks" class="gc-forks">0K</div><div id="GC2cwf7g-license" class="gc-license">0K</div><span id="GC2cwf7g-language" class="gc-language">Waiting...</span></div><script id="GC2cwf7g-script" type="text/javascript" defer>
+<section><h1 id="探索随机图随机url的本质">探索随机图（随机URL）的本质<a class="anchor" href="#探索随机图随机url的本质"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h1><p>我们刚刚只是在抽象的说明某种架构 <strong>好像</strong> 可行，<strong>好像</strong> 又有什么问题，然后又有一种什么新思路 <strong>好像</strong> 可以解决这个问题</p><p>但我们要走的路才刚刚开始，我们不妨思考一下，随机图，又或者说随机URL这类项目，服务器（如果有）究竟发送了什么给客户端，客户端又对服务器发回的报文执行了什么动作</p><p>你肯定知道，如果想要客户端每次请求同一个URL，都返回不同的东西，那肯定是服务器针对每一个请求都返回了不同的响应，它可以是内部的，比如直接在响应体塞图片，又或者也可以是 <strong>重定向</strong></p><p>直接在响应体塞图片很简单，在客户端是不可见的，当客户端请求API时，服务器直接将选中的图片作为响应体发出，在客户端看来，就好像是请求了一张图片，只不过每次刷新都不一样</p><p>而响应 <strong>重定向</strong> 就更简单了，只需要让服务器发送一个 <strong>临时重定向</strong> 的状态码，比如 <strong>302</strong></p><p>有人就会说了，为什么必须要 <strong>临时重定向</strong> ？</p><p>因为你肯定是想要客户端每次刷新都返回不同的图，一旦你使用了 <strong>永久重定向</strong> 如 <strong>301</strong> ，客户端在收到 <strong>301</strong> 的那一刻就会在浏览器里写一个记录：<strong>下次访问这个URL直接重定向，不再请求服务器</strong> ，这就会导致你的随机图API真的就变成一张图片了</p><p>那么，这两种方法哪种更好呢？</p><p>各有利弊，一句话说明：<strong>直接返回MIME类型是连请求复用，仅需一次请求即可得到图片。而返回302重定向至少需要客户端请求两次</strong></p><p>这得看你的实际架构，如果说你是前后端分离，即逻辑和资产不在一个地方，肯定是 302 好，因为如果你直接在响应体塞图片，就相当于你的服务器作为 <strong>代理</strong> 让客户端访问你的资产，流量全部走你服务器</p><p>而如果说你前后端都在一起，正常情况下来说，一次请求复用肯定是比两次连接更快的，不过为了方便管理和统计，我的大部分API仍然使用 <strong>302 重定向</strong></p><a id="GCjjrxn8-card" class="card-github fetch-waiting no-styling" href="https://github.com/afoim/EdgeOne_Function_PicAPI" target="_blank" repo="afoim/EdgeOne_Function_PicAPI" rel="nofollow"><div class="gc-titlebar"><div class="gc-titlebar-left"><div class="gc-owner"><div id="GCjjrxn8-avatar" class="gc-avatar"></div><div class="gc-user">afoim</div></div><div class="gc-divider">/</div><div class="gc-repo">EdgeOne_Function_PicAPI</div></div><div class="github-logo"></div></div><div id="GCjjrxn8-description" class="gc-description">Waiting for api.github.com...</div><div class="gc-infobar"><div id="GCjjrxn8-stars" class="gc-stars">00K</div><div id="GCjjrxn8-forks" class="gc-forks">0K</div><div id="GCjjrxn8-license" class="gc-license">0K</div><span id="GCjjrxn8-language" class="gc-language">Waiting...</span></div><script id="GCjjrxn8-script" type="text/javascript" defer>
       fetch('https://api.github.com/repos/afoim/EdgeOne_Function_PicAPI', { referrerPolicy: "no-referrer" }).then(response => response.json()).then(data => {
-        document.getElementById('GC2cwf7g-description').innerText = data.description?.replace(/:[a-zA-Z0-9_]+:/g, '') || "Description not set";
-        document.getElementById('GC2cwf7g-language').innerText = data.language;
-        document.getElementById('GC2cwf7g-forks').innerText = Intl.NumberFormat('en-us', { notation: "compact", maximumFractionDigits: 1 }).format(data.forks).replaceAll(" ", '');
-        document.getElementById('GC2cwf7g-stars').innerText = Intl.NumberFormat('en-us', { notation: "compact", maximumFractionDigits: 1 }).format(data.stargazers_count).replaceAll(" ", '');
-        const avatarEl = document.getElementById('GC2cwf7g-avatar');
+        document.getElementById('GCjjrxn8-description').innerText = data.description?.replace(/:[a-zA-Z0-9_]+:/g, '') || "Description not set";
+        document.getElementById('GCjjrxn8-language').innerText = data.language;
+        document.getElementById('GCjjrxn8-forks').innerText = Intl.NumberFormat('en-us', { notation: "compact", maximumFractionDigits: 1 }).format(data.forks).replaceAll(" ", '');
+        document.getElementById('GCjjrxn8-stars').innerText = Intl.NumberFormat('en-us', { notation: "compact", maximumFractionDigits: 1 }).format(data.stargazers_count).replaceAll(" ", '');
+        const avatarEl = document.getElementById('GCjjrxn8-avatar');
         avatarEl.style.backgroundImage = 'url(' + data.owner.avatar_url + ')';
         avatarEl.style.backgroundColor = 'transparent';
-        document.getElementById('GC2cwf7g-license').innerText = data.license?.spdx_id || "no-license";
-        document.getElementById('GC2cwf7g-card').classList.remove("fetch-waiting");
-        console.log("[GITHUB-CARD] Loaded card for afoim/EdgeOne_Function_PicAPI | GC2cwf7g.")
+        document.getElementById('GCjjrxn8-license').innerText = data.license?.spdx_id || "no-license";
+        document.getElementById('GCjjrxn8-card').classList.remove("fetch-waiting");
+        console.log("[GITHUB-CARD] Loaded card for afoim/EdgeOne_Function_PicAPI | GCjjrxn8.")
       }).catch(err => {
-        const c = document.getElementById('GC2cwf7g-card');
+        const c = document.getElementById('GCjjrxn8-card');
         c?.classList.add("fetch-error");
-        console.warn("[GITHUB-CARD] (Error) Loading card for afoim/EdgeOne_Function_PicAPI | GC2cwf7g.")
+        console.warn("[GITHUB-CARD] (Error) Loading card for afoim/EdgeOne_Function_PicAPI | GCjjrxn8.")
       })
     </script></a><p>上线的API： <a href="https://eopfapi.acofork.com/pic?img=ua" rel="nofollow" target="_blank">https://eopfapi.acofork.com/pic?img=ua</a></p></section>
 <section><h1 id="奇技淫巧1利用cloudflare-origin-rules实现无计费的随机url">奇技淫巧1：利用Cloudflare Origin Rules实现无计费的随机URL<a class="anchor" href="#奇技淫巧1利用cloudflare-origin-rules实现无计费的随机url"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h1><blockquote>
 <p>Video: <a href="https://www.bilibili.com/video/BV19ZBzB8EDQ/" rel="nofollow" target="_blank">https://www.bilibili.com/video/BV19ZBzB8EDQ/</a>
 起因于有一天一位粉丝在我视频下留言
 <img  width="977" height="137" loading="lazy" decoding="async" src="/_astro/random-url-gen-9.CTknNhvj_1GPTPE.webp" ></p>
-</blockquote><p>他提到的仓库为</p><a id="GCatgxje-card" class="card-github fetch-waiting no-styling" href="https://github.com/Mabbs/cf-hitokoto" target="_blank" repo="Mabbs/cf-hitokoto" rel="nofollow"><div class="gc-titlebar"><div class="gc-titlebar-left"><div class="gc-owner"><div id="GCatgxje-avatar" class="gc-avatar"></div><div class="gc-user">Mabbs</div></div><div class="gc-divider">/</div><div class="gc-repo">cf-hitokoto</div></div><div class="github-logo"></div></div><div id="GCatgxje-description" class="gc-description">Waiting for api.github.com...</div><div class="gc-infobar"><div id="GCatgxje-stars" class="gc-stars">00K</div><div id="GCatgxje-forks" class="gc-forks">0K</div><div id="GCatgxje-license" class="gc-license">0K</div><span id="GCatgxje-language" class="gc-language">Waiting...</span></div><script id="GCatgxje-script" type="text/javascript" defer>
+</blockquote><p>他提到的仓库为</p><a id="GCvq1sf3-card" class="card-github fetch-waiting no-styling" href="https://github.com/Mabbs/cf-hitokoto" target="_blank" repo="Mabbs/cf-hitokoto" rel="nofollow"><div class="gc-titlebar"><div class="gc-titlebar-left"><div class="gc-owner"><div id="GCvq1sf3-avatar" class="gc-avatar"></div><div class="gc-user">Mabbs</div></div><div class="gc-divider">/</div><div class="gc-repo">cf-hitokoto</div></div><div class="github-logo"></div></div><div id="GCvq1sf3-description" class="gc-description">Waiting for api.github.com...</div><div class="gc-infobar"><div id="GCvq1sf3-stars" class="gc-stars">00K</div><div id="GCvq1sf3-forks" class="gc-forks">0K</div><div id="GCvq1sf3-license" class="gc-license">0K</div><span id="GCvq1sf3-language" class="gc-language">Waiting...</span></div><script id="GCvq1sf3-script" type="text/javascript" defer>
       fetch('https://api.github.com/repos/Mabbs/cf-hitokoto', { referrerPolicy: "no-referrer" }).then(response => response.json()).then(data => {
-        document.getElementById('GCatgxje-description').innerText = data.description?.replace(/:[a-zA-Z0-9_]+:/g, '') || "Description not set";
-        document.getElementById('GCatgxje-language').innerText = data.language;
-        document.getElementById('GCatgxje-forks').innerText = Intl.NumberFormat('en-us', { notation: "compact", maximumFractionDigits: 1 }).format(data.forks).replaceAll(" ", '');
-        document.getElementById('GCatgxje-stars').innerText = Intl.NumberFormat('en-us', { notation: "compact", maximumFractionDigits: 1 }).format(data.stargazers_count).replaceAll(" ", '');
-        const avatarEl = document.getElementById('GCatgxje-avatar');
+        document.getElementById('GCvq1sf3-description').innerText = data.description?.replace(/:[a-zA-Z0-9_]+:/g, '') || "Description not set";
+        document.getElementById('GCvq1sf3-language').innerText = data.language;
+        document.getElementById('GCvq1sf3-forks').innerText = Intl.NumberFormat('en-us', { notation: "compact", maximumFractionDigits: 1 }).format(data.forks).replaceAll(" ", '');
+        document.getElementById('GCvq1sf3-stars').innerText = Intl.NumberFormat('en-us', { notation: "compact", maximumFractionDigits: 1 }).format(data.stargazers_count).replaceAll(" ", '');
+        const avatarEl = document.getElementById('GCvq1sf3-avatar');
         avatarEl.style.backgroundImage = 'url(' + data.owner.avatar_url + ')';
         avatarEl.style.backgroundColor = 'transparent';
-        document.getElementById('GCatgxje-license').innerText = data.license?.spdx_id || "no-license";
-        document.getElementById('GCatgxje-card').classList.remove("fetch-waiting");
-        console.log("[GITHUB-CARD] Loaded card for Mabbs/cf-hitokoto | GCatgxje.")
+        document.getElementById('GCvq1sf3-license').innerText = data.license?.spdx_id || "no-license";
+        document.getElementById('GCvq1sf3-card').classList.remove("fetch-waiting");
+        console.log("[GITHUB-CARD] Loaded card for Mabbs/cf-hitokoto | GCvq1sf3.")
       }).catch(err => {
-        const c = document.getElementById('GCatgxje-card');
+        const c = document.getElementById('GCvq1sf3-card');
         c?.classList.add("fetch-error");
-        console.warn("[GITHUB-CARD] (Error) Loading card for Mabbs/cf-hitokoto | GCatgxje.")
+        console.warn("[GITHUB-CARD] (Error) Loading card for Mabbs/cf-hitokoto | GCvq1sf3.")
       })
     </script></a><p>大致为，Cloudflare在规则提供一个方法，该方法可以在规则层生成一个UUID，而UUID每次都是随机的，我们可以依据此来在规则层做随机URL</p><p>理论可行，实践开始</p><p>首先，我们要知道UUID是一串带有连字符的随机数，而每一位有16种可能，我们可以仅截取前4位，也就是 16^4 ，共能存储65536张图，每一张图可以分配到一个唯一的UUID，接下来让CF边缘在收到请求的时候，生成UUID，然后直接拼接URL请求静态资产，如 <code>/img/0000.jpg</code> ，再返回给客户端即可</p><p>那如果说我图比这多呢？加一位，16^5 = 1048576，够用了吧
-那如果说我图比这少呢？那我们可以让图片填充，说个极端的例子，假如你只有2张图，每张图创建32768个副本即可，依此类推</p><p><img  width="359" height="1109" loading="lazy" decoding="async" src="/_astro/random-url-gen-10.trLlbOQq_yaSq5.webp" ></p><a id="GCkt6y2o-card" class="card-github fetch-waiting no-styling" href="https://github.com/afoim/cf-rule-random-url" target="_blank" repo="afoim/cf-rule-random-url" rel="nofollow"><div class="gc-titlebar"><div class="gc-titlebar-left"><div class="gc-owner"><div id="GCkt6y2o-avatar" class="gc-avatar"></div><div class="gc-user">afoim</div></div><div class="gc-divider">/</div><div class="gc-repo">cf-rule-random-url</div></div><div class="github-logo"></div></div><div id="GCkt6y2o-description" class="gc-description">Waiting for api.github.com...</div><div class="gc-infobar"><div id="GCkt6y2o-stars" class="gc-stars">00K</div><div id="GCkt6y2o-forks" class="gc-forks">0K</div><div id="GCkt6y2o-license" class="gc-license">0K</div><span id="GCkt6y2o-language" class="gc-language">Waiting...</span></div><script id="GCkt6y2o-script" type="text/javascript" defer>
+那如果说我图比这少呢？那我们可以让图片填充，说个极端的例子，假如你只有2张图，每张图创建32768个副本即可，依此类推</p><p><img  width="359" height="1109" loading="lazy" decoding="async" src="/_astro/random-url-gen-10.trLlbOQq_yaSq5.webp" ></p><a id="GCynqbr8-card" class="card-github fetch-waiting no-styling" href="https://github.com/afoim/cf-rule-random-url" target="_blank" repo="afoim/cf-rule-random-url" rel="nofollow"><div class="gc-titlebar"><div class="gc-titlebar-left"><div class="gc-owner"><div id="GCynqbr8-avatar" class="gc-avatar"></div><div class="gc-user">afoim</div></div><div class="gc-divider">/</div><div class="gc-repo">cf-rule-random-url</div></div><div class="github-logo"></div></div><div id="GCynqbr8-description" class="gc-description">Waiting for api.github.com...</div><div class="gc-infobar"><div id="GCynqbr8-stars" class="gc-stars">00K</div><div id="GCynqbr8-forks" class="gc-forks">0K</div><div id="GCynqbr8-license" class="gc-license">0K</div><span id="GCynqbr8-language" class="gc-language">Waiting...</span></div><script id="GCynqbr8-script" type="text/javascript" defer>
       fetch('https://api.github.com/repos/afoim/cf-rule-random-url', { referrerPolicy: "no-referrer" }).then(response => response.json()).then(data => {
-        document.getElementById('GCkt6y2o-description').innerText = data.description?.replace(/:[a-zA-Z0-9_]+:/g, '') || "Description not set";
-        document.getElementById('GCkt6y2o-language').innerText = data.language;
-        document.getElementById('GCkt6y2o-forks').innerText = Intl.NumberFormat('en-us', { notation: "compact", maximumFractionDigits: 1 }).format(data.forks).replaceAll(" ", '');
-        document.getElementById('GCkt6y2o-stars').innerText = Intl.NumberFormat('en-us', { notation: "compact", maximumFractionDigits: 1 }).format(data.stargazers_count).replaceAll(" ", '');
-        const avatarEl = document.getElementById('GCkt6y2o-avatar');
+        document.getElementById('GCynqbr8-description').innerText = data.description?.replace(/:[a-zA-Z0-9_]+:/g, '') || "Description not set";
+        document.getElementById('GCynqbr8-language').innerText = data.language;
+        document.getElementById('GCynqbr8-forks').innerText = Intl.NumberFormat('en-us', { notation: "compact", maximumFractionDigits: 1 }).format(data.forks).replaceAll(" ", '');
+        document.getElementById('GCynqbr8-stars').innerText = Intl.NumberFormat('en-us', { notation: "compact", maximumFractionDigits: 1 }).format(data.stargazers_count).replaceAll(" ", '');
+        const avatarEl = document.getElementById('GCynqbr8-avatar');
         avatarEl.style.backgroundImage = 'url(' + data.owner.avatar_url + ')';
         avatarEl.style.backgroundColor = 'transparent';
-        document.getElementById('GCkt6y2o-license').innerText = data.license?.spdx_id || "no-license";
-        document.getElementById('GCkt6y2o-card').classList.remove("fetch-waiting");
-        console.log("[GITHUB-CARD] Loaded card for afoim/cf-rule-random-url | GCkt6y2o.")
+        document.getElementById('GCynqbr8-license').innerText = data.license?.spdx_id || "no-license";
+        document.getElementById('GCynqbr8-card').classList.remove("fetch-waiting");
+        console.log("[GITHUB-CARD] Loaded card for afoim/cf-rule-random-url | GCynqbr8.")
       }).catch(err => {
-        const c = document.getElementById('GCkt6y2o-card');
+        const c = document.getElementById('GCynqbr8-card');
         c?.classList.add("fetch-error");
-        console.warn("[GITHUB-CARD] (Error) Loading card for afoim/cf-rule-random-url | GCkt6y2o.")
+        console.warn("[GITHUB-CARD] (Error) Loading card for afoim/cf-rule-random-url | GCynqbr8.")
       })
     </script></a><p>上线的API： <a href="https://img.072103.xyz/h" rel="nofollow" target="_blank">https://img.072103.xyz/h</a> | <a href="https://img.072103.xyz/v" rel="nofollow" target="_blank">https://img.072103.xyz/v</a></p></section>
 <section><h1 id="奇技淫巧2丢掉后端让前端js自己拼url">奇技淫巧2：丢掉后端，让前端JS自己拼URL<a class="anchor" href="#奇技淫巧2丢掉后端让前端js自己拼url"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h1><blockquote>
 <p>Video: <a href="https://www.bilibili.com/video/BV1tNB4BEEaE/" rel="nofollow" target="_blank">https://www.bilibili.com/video/BV1tNB4BEEaE/</a>
 Video2: <a href="https://www.bilibili.com/video/BV1mMBKBREkB/" rel="nofollow" target="_blank">https://www.bilibili.com/video/BV1mMBKBREkB/</a></p>
-</blockquote><p>把思路打开，我们真的需要一个 <strong>请求一个端点，返回一个随机内容</strong> 的东西吗</p><p>如果只是想在我们的网站上用上随机图，那是不是可以让客户端JavaScript代劳呢</p><p>大致原理为编写一个客户端JS，生成一个随机数，然后拼接URL得到最终的随机图，然后寻找需要替换为随机图的img容器或者背景图容器，替换其中内容</p><p><img  width="1450" height="321" loading="lazy" decoding="async" src="/_astro/random-url-gen-11.BOuJ-La1_2s8zAb.webp" ></p><a id="GCv4nxcm-card" class="card-github fetch-waiting no-styling" href="https://github.com/afoim/Static_RandomPicAPI" target="_blank" repo="afoim/Static_RandomPicAPI" rel="nofollow"><div class="gc-titlebar"><div class="gc-titlebar-left"><div class="gc-owner"><div id="GCv4nxcm-avatar" class="gc-avatar"></div><div class="gc-user">afoim</div></div><div class="gc-divider">/</div><div class="gc-repo">Static_RandomPicAPI</div></div><div class="github-logo"></div></div><div id="GCv4nxcm-description" class="gc-description">Waiting for api.github.com...</div><div class="gc-infobar"><div id="GCv4nxcm-stars" class="gc-stars">00K</div><div id="GCv4nxcm-forks" class="gc-forks">0K</div><div id="GCv4nxcm-license" class="gc-license">0K</div><span id="GCv4nxcm-language" class="gc-language">Waiting...</span></div><script id="GCv4nxcm-script" type="text/javascript" defer>
+</blockquote><p>把思路打开，我们真的需要一个 <strong>请求一个端点，返回一个随机内容</strong> 的东西吗</p><p>如果只是想在我们的网站上用上随机图，那是不是可以让客户端JavaScript代劳呢</p><p>大致原理为编写一个客户端JS，生成一个随机数，然后拼接URL得到最终的随机图，然后寻找需要替换为随机图的img容器或者背景图容器，替换其中内容</p><p><img  width="1450" height="321" loading="lazy" decoding="async" src="/_astro/random-url-gen-11.BOuJ-La1_2s8zAb.webp" ></p><a id="GC70a6yi-card" class="card-github fetch-waiting no-styling" href="https://github.com/afoim/Static_RandomPicAPI" target="_blank" repo="afoim/Static_RandomPicAPI" rel="nofollow"><div class="gc-titlebar"><div class="gc-titlebar-left"><div class="gc-owner"><div id="GC70a6yi-avatar" class="gc-avatar"></div><div class="gc-user">afoim</div></div><div class="gc-divider">/</div><div class="gc-repo">Static_RandomPicAPI</div></div><div class="github-logo"></div></div><div id="GC70a6yi-description" class="gc-description">Waiting for api.github.com...</div><div class="gc-infobar"><div id="GC70a6yi-stars" class="gc-stars">00K</div><div id="GC70a6yi-forks" class="gc-forks">0K</div><div id="GC70a6yi-license" class="gc-license">0K</div><span id="GC70a6yi-language" class="gc-language">Waiting...</span></div><script id="GC70a6yi-script" type="text/javascript" defer>
       fetch('https://api.github.com/repos/afoim/Static_RandomPicAPI', { referrerPolicy: "no-referrer" }).then(response => response.json()).then(data => {
-        document.getElementById('GCv4nxcm-description').innerText = data.description?.replace(/:[a-zA-Z0-9_]+:/g, '') || "Description not set";
-        document.getElementById('GCv4nxcm-language').innerText = data.language;
-        document.getElementById('GCv4nxcm-forks').innerText = Intl.NumberFormat('en-us', { notation: "compact", maximumFractionDigits: 1 }).format(data.forks).replaceAll(" ", '');
-        document.getElementById('GCv4nxcm-stars').innerText = Intl.NumberFormat('en-us', { notation: "compact", maximumFractionDigits: 1 }).format(data.stargazers_count).replaceAll(" ", '');
-        const avatarEl = document.getElementById('GCv4nxcm-avatar');
+        document.getElementById('GC70a6yi-description').innerText = data.description?.replace(/:[a-zA-Z0-9_]+:/g, '') || "Description not set";
+        document.getElementById('GC70a6yi-language').innerText = data.language;
+        document.getElementById('GC70a6yi-forks').innerText = Intl.NumberFormat('en-us', { notation: "compact", maximumFractionDigits: 1 }).format(data.forks).replaceAll(" ", '');
+        document.getElementById('GC70a6yi-stars').innerText = Intl.NumberFormat('en-us', { notation: "compact", maximumFractionDigits: 1 }).format(data.stargazers_count).replaceAll(" ", '');
+        const avatarEl = document.getElementById('GC70a6yi-avatar');
         avatarEl.style.backgroundImage = 'url(' + data.owner.avatar_url + ')';
         avatarEl.style.backgroundColor = 'transparent';
-        document.getElementById('GCv4nxcm-license').innerText = data.license?.spdx_id || "no-license";
-        document.getElementById('GCv4nxcm-card').classList.remove("fetch-waiting");
-        console.log("[GITHUB-CARD] Loaded card for afoim/Static_RandomPicAPI | GCv4nxcm.")
+        document.getElementById('GC70a6yi-license').innerText = data.license?.spdx_id || "no-license";
+        document.getElementById('GC70a6yi-card').classList.remove("fetch-waiting");
+        console.log("[GITHUB-CARD] Loaded card for afoim/Static_RandomPicAPI | GC70a6yi.")
       }).catch(err => {
-        const c = document.getElementById('GCv4nxcm-card');
+        const c = document.getElementById('GC70a6yi-card');
         c?.classList.add("fetch-error");
-        console.warn("[GITHUB-CARD] (Error) Loading card for afoim/Static_RandomPicAPI | GCv4nxcm.")
+        console.warn("[GITHUB-CARD] (Error) Loading card for afoim/Static_RandomPicAPI | GC70a6yi.")
       })
     </script></a><p>上线的 API： <a href="https://pic1.acofork.com" rel="nofollow" target="_blank">https://pic1.acofork.com</a></p></section>
 <section><h1 id="总结">总结<a class="anchor" href="#总结"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h1><p>我们共探索了三种流派</p><ul>
@@ -514,7 +514,7 @@ const postUrl = "/posts/random-url-gen/";
 <a class="transition link text-[var(--primary)] font-medium" target="_blank" href="https://github.com/saicaca/fuwari">Fuwari</a> 强力驱动
 <br>
 本网站代码
-<a class="transition link text-[var(--primary)] font-medium" target="_blank" href="https://github.com/afoim/fuwari">已开源</a> <a class="transition link text-black/30 dark:text-white/30 hover:text-[var(--primary)] text-xs ml-1" target="_blank" href="https://github.com/afoim/fuwari/commit/61f8d5c">(61f8d5c @ 2026-02-06 11:09:27)</a> <br> <!-- <a class="transition link text-[var(--primary)] font-medium inline-flex items-center" href="https://beian.miit.gov.cn/#/Integrated/index" target="_blank"><img alt="" src="/favicon/foot-icp.png" width="16" height="16" class="h-4 mr-1">皖ICP备2025099787号-2</a>
+<a class="transition link text-[var(--primary)] font-medium" target="_blank" href="https://github.com/afoim/fuwari">已开源</a> <a class="transition link text-black/30 dark:text-white/30 hover:text-[var(--primary)] text-xs ml-1" target="_blank" href="https://github.com/afoim/fuwari/commit/2087c62">(2087c62 @ 2026-02-07 10:58:53)</a> <br> <!-- <a class="transition link text-[var(--primary)] font-medium inline-flex items-center" href="https://beian.miit.gov.cn/#/Integrated/index" target="_blank"><img alt="" src="/favicon/foot-icp.png" width="16" height="16" class="h-4 mr-1">皖ICP备2025099787号-2</a>
         <br> --> <div class="server-info-container flex flex-col items-center justify-center gap-1 mt-1"> <!-- Server info will be injected here --> </div> <!-- <a class="transition link text-[var(--primary)] font-medium inline-flex items-center" href="https://beian.mps.gov.cn/#/query/webSearch?code=34010302002608" target="_blank"><img alt="" src="/favicon/foot-ga.png" class="h-4 mr-1">皖公网安备34010302002608号</a>
         <br> --> </div> </div> <script>(function(){const serverConfig = [{"url":"","text":"Blog"},{"url":"https://u.2x.nz","text":"Umami"},{"url":"https://p.2x.nz","text":"RandomPic"}];
 
