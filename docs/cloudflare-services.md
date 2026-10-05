@@ -28,7 +28,33 @@
 
 ## 二、接口约定
 
-**统计 `t.juluo.work`**（`viewCounterConfig`）
+### 浏览量：数据源有两个，Umami 优先、自建兜底
+
+前台展示的数字**优先来自 Umami Cloud**（它从建站起就在记，数据是连续的），
+自建 Worker + D1 只在 Umami 取不到时补位。开关都在 `src/config.ts`：
+`umamiConfig.shareApiBase` + `viewCounterConfig.preferUmami`（优先），`viewCounterConfig.endpoint`（兜底）。
+
+| 角色 | 位置 | 行为 |
+| --- | --- | --- |
+| 上报（写） | `src/components/layout/BodyThirdPartyScripts.astro` | 每个页面引入 `{endpoint}/tracker.js`，它按 `location.pathname` 向自建 `/send` 报一次 |
+| 读（展示） | `src/scripts/view-counter-runtime.ts` | 先并发问 Umami（全站 1 次 + 每个路径 1 次），没覆盖到的路径再走自建 `POST /batch` 补齐；结果填 `#site-views`、文章卡片、`ViewsCounter` 的 span，并广播 `post-views-loaded` 给排序脚本 |
+
+**Umami 分享接口**（只读、无需密钥；shareId 本来就是公开的，导航栏「统计」就指向分享页）：
+
+```
+GET  {gateway}/api/share/{shareId}
+     -> {"shareId":...,"websiteId":"842d...","token":"<JWT，10 分钟有效>"}
+GET  {gateway}/api/websites/{websiteId}/stats?startAt=0&endAt=<ms>              -> 全站全时段 pageviews
+GET  {gateway}/api/websites/{websiteId}/stats?...&path=eq.%2Fposts%2Fxxx%2F     -> 该路径全时段 pageviews
+     ⚠️ 必须带两个头：x-umami-share-token: <token> 与 x-umami-share-context: <shareId>
+        （少了 context 头一律 401 —— umami 源码里叫「share token used outside share context」）
+     ⚠️ gateway 按区不同：美国区是 https://gateway-us.umami.is
+```
+
+token 缓存在 `sessionStorage`（8 分钟）；401 时丢缓存重取一次，再失败就整体回落自建接口。
+这套接口没有公开文档，参数是照着分享页抓包对出来的——**因此必须有兜底**，别把它当稳定契约。
+
+**自建 `t.juluo.work`**（`viewCounterConfig.endpoint`，兜底）
 
 ```
 GET  /share?pathname=/posts/xxx/   -> {"pathname":"/posts/xxx/","views":12}
@@ -37,15 +63,8 @@ GET  /tracker.js                   -> 自动上报的脚本（按 pathname 计�
 POST /send    {"pathname":"/"}     -> 记录一次访问（只接受来自 TRACKED_SITE_HOST 的请求）
 ```
 
-前台的两半截分工（都在本仓库里）：
-
-| 角色 | 位置 | 行为 |
-| --- | --- | --- |
-| 写（上报） | `src/components/layout/BodyThirdPartyScripts.astro` | 每个页面引入 `{endpoint}/tracker.js`，它按 `location.pathname` 向 `/send` 报一次 |
-| 读（展示） | `src/scripts/view-counter-runtime.ts` | 每页一次 `POST /batch`，请求体固定是 `["/", "/posts/<slug>/", ...]`：第 0 项回填侧栏「访问量」`#site-views`，其余回填各文章卡片 |
-
-⚠️ 只引读取端不引 `tracker.js`，D1 里就永远是空的，前台所有数字都会是 0（本项目曾长期处于这个状态）。
-侧栏那个「访问量」的取值是 `views[0]`，也就是**首页 `/` 的 PV**，不是全站所有路径求和——要真·全站合计得给 Worker 加一个 `SUM` 接口。
+⚠️ 只引读取端不引 `tracker.js`，D1 里就永远是空的（本项目曾长期处于这个状态，前台所有数字都是 0）。
+D1 兜底里的 `/` 只是**首页 PV**，不是全站求和；换成 Umami 之后侧栏那个数才是真·全站全时段 PV（`/stats` 不带 path 过滤）。
 
 **链接卡片 `icon.juluo.work`**（`linkCardApiConfig`）
 
@@ -69,9 +88,15 @@ GET /ri/v/{n}.webp   竖屏（n = 1..3596）
 ## 三、`src/config.ts` 服务开关（当前值）
 
 ```ts
+export const umamiConfig: UmamiConfig = {
+	// ……websiteId / shareId / consentLevel 略……
+	shareApiBase: "https://gateway-us.umami.is", // 浏览量优先从这里读（分享页自己也在打这个域）
+};
+
 export const viewCounterConfig: ViewCounterConfig = {
 	enable: true,
-	endpoint: "https://t.juluo.work",
+	endpoint: "https://t.juluo.work", // 兜底：自建统计 Worker + D1
+	preferUmami: true, // 优先读 Umami 分享接口
 };
 
 export const linkCardApiConfig: LinkCardApiConfig = {
@@ -98,6 +123,7 @@ export const oneDriveConfig: OneDriveConfig = {
 - [x] `https://juluo.work` 与 `https://www.juluo.work` 301 跳转到博客
 - [x] `https://t.juluo.work/share?pathname=/` 返回 `{"pathname":"/","views":N}`
 - [x] 每个页面都引了上报脚本并真的发出 `POST /send`（本机 Chrome 实测：首页 `/`、文章页 `/posts/<slug>/`、归档页 `/archive/` 各 1 条）
+- [x] 浏览量优先取 Umami：本机构建实测侧栏显示 Umami 全时段 PV、文章卡片显示各文 PV；把网关掐断后自动回落到 `POST /batch`（用 111 的假数据肉眼确认过）
 - [x] `https://icon.juluo.work/?url=https://astro.build` 返回 JSON
 - [x] `https://pic.060730.xyz/ri/h/1.webp` 与 `/ri/v/1.webp` 返回图片
 - [ ] 在 Cloudflare 控制台把 Worker `peroe-blog` 连到 `juluowork/fuwari`（构建由 Cloudflare 负责，见 workers-deploy.md）
