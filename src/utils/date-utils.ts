@@ -64,7 +64,9 @@ export function parsePostDateToDate(value: unknown): Date {
 		const hh = Number(localNoZone[4]);
 		const mm = Number(localNoZone[5]);
 		const ss = Number(localNoZone[6] ?? "0");
-		return new Date(Date.UTC(y, m - 1, d, hh, mm, ss));
+		// frontmatter 里不带时区的时间按「北京时间（UTC+8）」解释：
+		// 否则写 21:20 会被当成 UTC，页面显示成次日 05:20。
+		return new Date(Date.UTC(y, m - 1, d, hh - 8, mm, ss));
 	}
 
 	return new Date(s);

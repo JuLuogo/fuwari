@@ -25,7 +25,7 @@
 ```yaml
 ---
 title: 用 Cloudflare Workers 托管静态博客并接上自定义域名   # ≤ 40 字，别用问号堆砌
-published: 2026-10-05 21:30:00        # 支持 'YYYY-MM-DD HH:mm:ss'
+published: 2026-10-05 21:30:00 +08:00  # ⚠️ 必须带 +08:00，见下方说明
 updated: 2026-10-06 10:00:00          # 可选，改过内容再填
 description: 从零把 Astro 静态站点部署到 Workers：资源绑定、自定义域、缓存与踩坑记录。  # 60~120 字，概括全文
 tags:                                  # 2~4 个，复用已有标签优先
@@ -183,3 +183,19 @@ node render.mjs --html "D:\shots\terminal.html" --out "D:\shots\03-terminal.png"
 - ❌ 用外站图片直链（可能失效/盗链），一律自己截图或自己渲染。
 - ❌ 编造没验证过的命令输出（终端图必须来自真实命令执行结果）。
 - ❌ 一篇文章塞多个不相关主题；也不要为了凑字数灌水。
+
+## 八、实战踩坑（写文章前必看）
+
+1. **`published` / `updated` 必须带 `+08:00`**。
+   YAML 会把不带时区的 `2026-10-05 21:20:00` 直接解析成 **UTC** 时间，页面按 `Asia/Shanghai` 渲染后
+   就变成次日 05:20，看起来像排期到了明天。正确写法：`published: 2026-10-05 21:20:00 +08:00`。
+   （`date-utils.ts` 里对「带引号的纯字符串」也做了按北京时间解释的兜底，但别依赖它。）
+2. **图片按「正文出现顺序」编号**：正文里第 1 张图必须是 `01-xxx.webp`。写完后通读一遍顺序再定文件名，
+   否则改起来要连带改引用。
+3. **图片引用必须是绝对路径**：`/assets/images/posts/<slug>/01-xxx.webp`，不要写相对路径。
+4. **终端类插图要用真实执行过的命令输出**：Windows 上 `tracert -d`、`ping -n 20`、`curl -sI`、`openssl s_client`
+   都能直接跑；把输出丢进 `render.mjs` 渲染成图。
+5. **不确定的按钮文字先用 `probe-form.mjs` 探测**：例如 tcptest.cn 的是「单次测试」「开始查询」，
+   不是「开始测试」。测速/查询类站点记得 `--click2 "text=关闭广告"` 去掉广告浮层。
+6. **并发截图要给每个任务分配独立 profile**（`--profile "$env:TEMP\chrome-<名字>"`），
+   同一 profile 同时只能有一个 Chrome；工具已内置「启动前清理同 profile 残留进程」。
