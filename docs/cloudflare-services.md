@@ -37,6 +37,16 @@ GET  /tracker.js                   -> 自动上报的脚本（按 pathname 计�
 POST /send    {"pathname":"/"}     -> 记录一次访问（只接受来自 TRACKED_SITE_HOST 的请求）
 ```
 
+前台的两半截分工（都在本仓库里）：
+
+| 角色 | 位置 | 行为 |
+| --- | --- | --- |
+| 写（上报） | `src/components/layout/BodyThirdPartyScripts.astro` | 每个页面引入 `{endpoint}/tracker.js`，它按 `location.pathname` 向 `/send` 报一次 |
+| 读（展示） | `src/scripts/view-counter-runtime.ts` | 每页一次 `POST /batch`，请求体固定是 `["/", "/posts/<slug>/", ...]`：第 0 项回填侧栏「访问量」`#site-views`，其余回填各文章卡片 |
+
+⚠️ 只引读取端不引 `tracker.js`，D1 里就永远是空的，前台所有数字都会是 0（本项目曾长期处于这个状态）。
+侧栏那个「访问量」的取值是 `views[0]`，也就是**首页 `/` 的 PV**，不是全站所有路径求和——要真·全站合计得给 Worker 加一个 `SUM` 接口。
+
 **链接卡片 `icon.juluo.work`**（`linkCardApiConfig`）
 
 ```
@@ -87,6 +97,7 @@ export const oneDriveConfig: OneDriveConfig = {
 - [x] `https://blog.juluo.work` 首页/`/privacy/`/`/friends/`/`/sponsors/`/`/tools/` 可访问
 - [x] `https://juluo.work` 与 `https://www.juluo.work` 301 跳转到博客
 - [x] `https://t.juluo.work/share?pathname=/` 返回 `{"pathname":"/","views":N}`
+- [x] 每个页面都引了上报脚本并真的发出 `POST /send`（本机 Chrome 实测：首页 `/`、文章页 `/posts/<slug>/`、归档页 `/archive/` 各 1 条）
 - [x] `https://icon.juluo.work/?url=https://astro.build` 返回 JSON
 - [x] `https://pic.060730.xyz/ri/h/1.webp` 与 `/ri/v/1.webp` 返回图片
 - [ ] 在 Cloudflare 控制台把 Worker `peroe-blog` 连到 `juluowork/fuwari`（构建由 Cloudflare 负责，见 workers-deploy.md）

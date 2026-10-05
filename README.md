@@ -112,7 +112,7 @@ https://blog.juluo.work/posts/hello-world/    ← 线上地址
 │   │   └── timetable/          # 课表相关组件
 │   ├── layouts/                # 页面骨架（Layout.astro 负责 <head>、主题、脚本注入）
 │   ├── plugins/                # Remark / Rehype 插件（提示块、代码块、链接卡片、剧透、摘要、阅读时长…）
-│   ├── scripts/                # 浏览器端运行时脚本（代码高亮、灯箱、列表排序、行内 diff）
+│   ├── scripts/                # 浏览器端运行时脚本（代码高亮、灯箱、列表排序、浏览量读取、行内 diff）
 │   ├── utils/                  # 工具函数（内容排序、日期、加密载荷、可见性过滤、TOC…）
 │   ├── data/                   # 数据文件：友链 / 赞助 / 课表 / 加密文章密文
 │   ├── styles/                 # 全局样式与主题变量
