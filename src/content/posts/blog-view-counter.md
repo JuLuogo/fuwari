@@ -1,7 +1,7 @@
 ---
 title: 静态博客怎么显示每篇文章的浏览量：从 D1 读数接口到前端排序的完整链路
 published: 2026-10-05 22:15:00 +08:00
-updated: 2026-10-05 23:55:00 +08:00
+updated: 2026-10-06 00:20:00 +08:00
 description: 静态站没有后端，文章卡片上的浏览量到底从哪来？这篇拆我自己这套链路：D1 里只有 pathname + views 两列、两个读接口的分工、前端如何一次批量取数并先藏后显避免抖动、列表页按热度排序的索引对齐，以及防刷与缓存口径的取舍。
 tags:
   - 建站
@@ -240,13 +240,16 @@ curl -s "https://t.juluo.work/share?pathname=/__selftest"
 
 `tracker.js` 自己会用 `document.currentScript.src` 推出 `t.juluo.work`，再按 `location.pathname` 报一次，不需要额外参数。实测现在每次页面浏览固定 3 个请求：`GET /tracker.js`（可缓存 1 小时）、`POST /send`、`POST /batch`。
 
+> [!NOTE]
+> 下面两小节（改动二、实测）写的是**第一版**：读取端只问自建接口。同一夜更晚的那次改造把数据源换成了「优先 Umami、自建兜底」，读取端结构没变，但请求数从 3 条变成了 `tracker.js + /send + (1 + N) 条 Umami 查询`，细节见文末「再补一刀」。
+
 ### 改动二：读取端收拢成一个脚本
 
 原来取数逻辑散在两处（`PostMeta.astro` 的内联脚本 + `src/scripts/post-list-sort.ts`），靠 `__VIEWS_FETCHED__` 和 `__PAGE_POSTS_DATA__` 两个全局标志互相让位。能用，但有个硬伤：**`/` 这个路径只有排序脚本会拼进去**，而排序脚本只挂在列表页——所以文章页、归档页的侧栏「访问量」永远是隐藏的，同一个组件在不同页面表现不一致。
 
-现在收拢成 `src/scripts/view-counter-runtime.ts`：卡片只往 `__VIEWS_QUEUE__` 里登记 slug，读取端每页跑一次、请求体固定以 `/` 开头；回来之后 `views[0]` 写侧栏，其余按 slug 填卡片，最后广播一个 `post-views-loaded` 事件给排序脚本消费。排序脚本里那段 fetch 和「数据没到就 `setInterval` 轮询」的代码也一起删了，它现在只管排序。
+现在收拢成 `src/scripts/view-counter-runtime.ts`：卡片只往 `__VIEWS_QUEUE__` 里登记 slug，读取端每页跑一次、请求体固定以 `/` 开头；回来之后 `views[0]` 写侧栏，其余按 slug 填卡片，最后广播一个 `post-views-loaded` 事件给排序脚本消费。排序脚本里那段 fetch 和「数据没到就 `setInterval` 轮询」的代码也一起删了，它现在只管排序。（`__VIEWS_FETCHED__` 这个标志当天夜里也一并删掉了——收拢之后没有任何地方读它，留着就是死代码。）
 
-### 实测（本机构建 + Chrome 抓包）
+### 实测（本机构建 + Chrome 抓包，第一版：读取只走自建接口）
 
 | 页面 | 发往 `t.juluo.work` 的请求 | 侧栏 `#site-views` |
 | --- | --- | --- |
@@ -292,6 +295,7 @@ GET  {gateway}/api/websites/{websiteId}/stats?…&path=eq.%2Fposts%2Fxxx%2F     
 
 1. **少了 `x-umami-share-context` 就是 401。** 我一开始只带了 token，怎么调都是 `{"error":{"message":"Unauthorized"}}`，换成浏览器里发也一样。翻 umami 源码才看到那段判断：拿到了 share token 还要检查分享上下文头，否则打日志 `Share token used outside share context` 直接拒掉——它防的是把别处签发的 token 拿来读分析数据。
 2. **网关是分区的。** 后台在 `cloud.umami.is/analytics/us/`，数据接口却在 `gateway-us.umami.is`。换区部署的话这个域名要跟着换，`src/config.ts` 里的 `umamiConfig.shareApiBase` 就是给它留的。
+3. **网关填错不会报错，只会静默全 0。** 这条是事后审计时才补测的：同一个 shareId，`gateway-us` 和 `gateway-eu` **都能换到 token**（这个接口跨区），但数据只认网站所在的区——查到别的区返回的是 **HTTP 200 + 全 0**，不是错误码。而 `0` 在前端眼里是合法数字，所以它不会触发兜底，页面就安安静静显示 0。换区时务必打开自己的分享页、在 Network 里核对域名，别凭记忆填。
 
 ### 代码怎么改的：一个读取端，两个数据源，按缺口回落
 
