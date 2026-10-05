@@ -32,7 +32,7 @@ jobs:
         run: pnpm install
 
       - name: Build
-        run: git clone https://github.com/afoim/fuwari temp && cd temp && pnpm update-diff && cd .. && mkdir -p src/json && mv -f temp/src/json/git-history.json src/json/git-history.json && rm -rf temp && pnpm build:cdn
+        run: git clone https://github.com/juluogo/fuwari temp && cd temp && pnpm update-diff && cd .. && mkdir -p src/json && mv -f temp/src/json/git-history.json src/json/git-history.json && rm -rf temp && pnpm build:cdn
 
       - name: Deploy to page branch
         uses: peaceiris/actions-gh-pages@v3
