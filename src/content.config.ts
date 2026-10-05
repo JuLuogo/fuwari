@@ -34,8 +34,8 @@ const specCollection = defineCollection({
 	}),
 });
 
-// @ts-ignore TS2742：pnpm 隔离的 node_modules 让内联 zod 类型无法被“命名”，
-// 但这里刻意保留类型推断——它决定 CollectionEntry<"posts">["data"] 是否带完整字段类型。
+// 刻意保留类型推断：它决定 CollectionEntry<"posts">["data"] 是否带完整字段类型。
+// （不要加显式类型标注，也不要把 tsconfig 的 declaration 打开，否则会退化成 unknown / TS2742）
 export const collections = {
 	posts: postsCollection,
 	spec: specCollection,
