@@ -5,6 +5,7 @@ import type {
 	ImageFallbackConfig,
 	LicenseConfig,
 	LinkCardApiConfig,
+	NatCheckConfig,
 	NavBarConfig,
 	OneDriveConfig,
 	ProfileConfig,
@@ -209,6 +210,13 @@ export const giscusConfig: GiscusConfig = {
 	mapping: "pathname",
 	lang: "zh-CN",
 	theme: `https://${customDomain}/css/giscus.css`,
+};
+
+// NAT 类型检测后端：原站后端是 Python + Docker（Twin-Server STUN，需要 UDP 端口），
+// Cloudflare Worker 无法承载；有 VPS 时把地址填进来并把 enable 打开
+export const natCheckConfig: NatCheckConfig = {
+	enable: false,
+	apiUrl: "",
 };
 
 // OneDrive / 对象存储文件索引（工具页的 OneDrive 标签页）：自建后填写

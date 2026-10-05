@@ -119,6 +119,12 @@ export type OneDriveConfig = {
 	apiBase: string;
 };
 
+export type NatCheckConfig = {
+	enable: boolean;
+	/** 后端地址，例如 https://nat.juluo.work/api/analyze（该服务需要 UDP，通常得跑在 VPS 上） */
+	apiUrl: string;
+};
+
 export type GiscusConfig = {
 	enable: boolean;
 	repo: string;

@@ -1,6 +1,6 @@
 <script lang="ts">
 import { tick } from "svelte";
-import { siteConfig } from "../config.ts";
+import { natCheckConfig } from "../config.ts";
 
 let logs: string[] = ["System ready."];
 let isTesting = false;
@@ -173,12 +173,17 @@ async function startTest() {
 		const res_gather: any = await gatherCandidates(primaryHost, secHost);
 		const data = res_gather.data;
 		pc = res_gather.pc;
+		if (!natCheckConfig.apiUrl) {
+			logItem("未配置检测后端（需自建，见 src/config.ts 的 natCheckConfig），已跳过主动探测。");
+			if (pc) pc.close();
+			return;
+		}
 		logItem(`Sending context to server for deep active inspection...`);
 		logItem(`Awaiting active filtering UDP probes...`);
 
 		// Server performs active probes
 		// 默认后端 Python 代码 API 运行在 8080 端口，若使用了反向代理可移除 :8080
-		const apiUrl = `https://nat.${siteConfig.rootDomain}/api/analyze`;
+		const apiUrl = natCheckConfig.apiUrl;
 		const res = await fetch(apiUrl, {
 			method: "POST",
 			body: JSON.stringify(data),

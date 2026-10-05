@@ -1,10 +1,15 @@
 ---
-export const toolMeta = {
-	title: "NAT 检测",
-	description: "高级 NAT 类型及连通性探测",
-	icon: "material-symbols:network-check-rounded",
-	order: 5,
-};
+import { natCheckConfig } from "@/config";
+
+// 未配置后端时不暴露到工具列表（见 src/config.ts 的 natCheckConfig）
+export const toolMeta = natCheckConfig.enable
+	? {
+			title: "NAT 检测",
+			description: "高级 NAT 类型及连通性探测",
+			icon: "material-symbols:network-check-rounded",
+			order: 5,
+		}
+	: undefined;
 
 import NatCheck from "@components/NatCheck.svelte";
 import PageCardHeader from "@components/misc/PageCardHeader.astro";
