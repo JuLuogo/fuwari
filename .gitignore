@@ -71,3 +71,46 @@ private/
 
 #  Git Diff（构建时由 pnpm update-diff 生成）
 src/json/git-history.json
+
+# ============================================================
+# 临时文件与本地状态：一律不进生产仓库（调试脚本用完即删）
+# ============================================================
+
+# ⚠️ 注意：这些规则只防止「新增」文件被提交，已被跟踪的文件必须用
+#    git rm --cached <path> 移出版本控制。
+
+# 编辑器 / 本地工作区状态
+.obsidian/
+.vscode/
+.idea/
+
+# 工具缓存
+.wrangler/
+.turbo/
+.cache/
+
+# 调试用的一次性脚本与产物（本项目约定：verify-*.py、spike-* 之类只留本地）
+verify-*
+spike-*
+scratch/
+tmp/
+temp/
+*.tmp
+*.temp
+*.bak
+*.orig
+*.rej
+*.swp
+*~
+*.log
+logs/
+__pycache__/
+*.pyc
+
+# 本地环境与密钥（绝不提交）
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.secrets/
