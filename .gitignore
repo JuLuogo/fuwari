@@ -62,5 +62,5 @@ _bmad-output/
 # 课表
 src/data/timetable/source/
 
-#  Git Diff
-json/git-history.json
+#  Git Diff（构建时由 pnpm update-diff 生成）
+src/json/git-history.json
