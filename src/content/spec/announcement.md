@@ -2,4 +2,4 @@
 enable: false
 level: tip
 ---
-我们诚邀您填写网站调研问卷，感谢您抽出宝贵时间作答： https://wj.qq.com/s2/26315232/649a/
+这里是公告内容，把 `enable` 改成 `true` 就会显示在站点顶部。
