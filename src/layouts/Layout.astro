@@ -1,5 +1,7 @@
 ---
 import "prismjs/themes/prism-tomorrow.css";
+// KaTeX 样式随构建打包（原来走 cdn.jsdelivr.net，国内可达性不稳定）
+import "katex/dist/katex.min.css";
 
 import "../styles/variables.styl";
 import "../styles/prism-custom.css";
@@ -275,9 +277,9 @@ const bannerOffset =
 		</style>
 
 
-		<!-- KaTeX CSS: async load to avoid blocking render -->
-		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css" media="print" onload="this.media='all'" />
-		<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css" /></noscript>
+		<!-- KaTeX 样式在 frontmatter 里 `import "katex/dist/katex.min.css"` 随构建打包
+		     （原先指向公共 CDN，国内可达性不稳定；字体也会被 Vite 一起处理成站内资源） -->
+
 
 		<slot name="head"></slot>
 

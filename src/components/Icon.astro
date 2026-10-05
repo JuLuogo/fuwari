@@ -1,4 +1,6 @@
 ---
+import { iconSvg } from "@utils/icon-svg";
+
 interface Props {
 	name: string;
 	class?: string;
@@ -7,30 +9,28 @@ interface Props {
 
 const { name, class: className, ...rest } = Astro.props;
 
-// 解析图标名称，格式：collection:icon-name
-const [collection, iconName] = name.includes(':') ? name.split(':', 2) : ['', name];
-
-// Iconify CDN URL
-const iconifyUrl = `https://api.iconify.design/${collection}/${iconName}.svg`;
+// 构建期就把图标解析成内联 SVG：运行时不会再向外请求图标数据
+const svg = iconSvg(name);
 ---
 
-<span 
-	class:list={["iconify-icon", className]} 
-	data-icon={name}
-	{...rest}
-	style={`
-		display: inline-block;
+<span class:list={["iconify-icon", className]} data-icon={name} {...rest}>
+	{svg && <Fragment set:html={svg} />}
+</span>
+
+<style>
+	.iconify-icon {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
 		width: 1em;
 		height: 1em;
-		background-color: currentColor;
-		mask-image: url('${iconifyUrl}');
-		mask-size: contain;
-		mask-repeat: no-repeat;
-		mask-position: center;
-		-webkit-mask-image: url('${iconifyUrl}');
-		-webkit-mask-size: contain;
-		-webkit-mask-repeat: no-repeat;
-		-webkit-mask-position: center;
+		flex: none;
 		vertical-align: -0.125em;
-	`}
-></span>
+	}
+
+	.iconify-icon :global(svg) {
+		display: block;
+		width: 1em;
+		height: 1em;
+	}
+</style>
