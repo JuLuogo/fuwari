@@ -1,6 +1,6 @@
 ---
 title: 给博客做一次全国 Ping 体检：Cloudflare 免费版在国内到底多慢
-published: 2026-10-05 21:20:00
+published: 2026-10-05 21:20:00 +08:00
 description: 博客刚上线，我想知道国内各地访问到底什么体验。用 tcptest.cn 的 156 个节点做了 Ping、Tcping、DNS 三轮实测，把数据摆出来，顺便讲清楚这些数字该怎么读。
 tags:
   - 网络
