@@ -39,7 +39,6 @@ let { title, banner, description, lang, setOGTypeArticle, ogImage } = Astro.prop
 
 // apply a class to the body element to decide the height of the banner, only used for initial page load
 const isHomePage = pathsEqual(Astro.url.pathname, url("/"));
-const isForumRoute = Astro.url.pathname.startsWith(url("/forum/"));
 
 
 // defines global css variables
