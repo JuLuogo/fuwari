@@ -1,0 +1,9 @@
+{
+	"name": "peroe-blog-artifact",
+	"private": true,
+	"version": "0.0.0",
+	"description": "由 GitHub Actions 生成的构建产物分支，供 Cloudflare Workers Builds 直接部署",
+	"devDependencies": {
+		"wrangler": "^4.147.0"
+	}
+}
