@@ -122,13 +122,23 @@ const { remarkPluginFrontmatter } = await render(entry);
 </style>
 
 <script define:vars={{ randomImage: randomImageConfig }}>
-	(function() {
-		if (!randomImage || !randomImage.enable || !randomImage.baseUrl || !randomImage.max) return;
+	(async function() {
+		if (!randomImage || !randomImage.enable || !randomImage.baseUrl) return;
 		const covers = document.querySelectorAll('.post-cover-random');
 		if (!covers.length) return;
+		const base = String(randomImage.baseUrl).replace(/\/+$/, "");
+		let max = Number(randomImage.max) || 0;
+		if (max <= 0) {
+			// max 为 0 时自动从随机图 API 的 count.json 读取横屏图片数量
+			try {
+				const res = await fetch(`${base}/count.json`, { cache: "no-store" });
+				if (res.ok) max = Number((await res.json())?.h) || 0;
+			} catch {}
+		}
+		if (max <= 0) return;
 		for (const img of covers) {
-			const n = Math.floor(Math.random() * randomImage.max) + 1;
-			img.src = `${randomImage.baseUrl}/ri/h/${n}.webp`;
+			const n = Math.floor(Math.random() * max) + 1;
+			img.src = `${base}/ri/h/${n}.webp`;
 		}
 	})();
 

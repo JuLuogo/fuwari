@@ -177,11 +177,11 @@ export const viewCounterConfig: ViewCounterConfig = {
 	endpoint: "https://t.juluo.work",
 };
 
-// 随机图 API：自建后把 enable 打开并填写地址（例如 https://p.juluo.work），
-// 图片需按 /ri/h/{n}.webp 存放，/count.json 返回 { "h": 总数 }
+// 随机图 API：自建 Worker 部署在 p.juluo.work（代码见 services/random-pic），
+// 图片放在 R2 桶 juluo 的 ri/h/ 与 ri/v/ 前缀下；max 为 0 时自动读取 /count.json
 export const randomImageConfig: RandomImageConfig = {
-	enable: false,
-	baseUrl: "",
+	enable: true,
+	baseUrl: "https://p.juluo.work",
 	max: 0,
 };
 

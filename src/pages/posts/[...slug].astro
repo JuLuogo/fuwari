@@ -326,14 +326,22 @@ const jsonLd = [
         setupImageLoading();
     }
 
-    // 随机封面图替换（需在 src/config.ts 配置 randomImageConfig）
-    function setupRandomCovers() {
-        if (!randomImage || !randomImage.enable || !randomImage.baseUrl || !randomImage.max) return;
+    // 随机封面图替换（需在 src/config.ts 配置 randomImageConfig；max 为 0 时自动读 count.json）
+    async function setupRandomCovers() {
+        if (!randomImage || !randomImage.enable || !randomImage.baseUrl) return;
         const covers = document.querySelectorAll('.post-cover-random');
         if (!covers.length) return;
         const base = String(randomImage.baseUrl).replace(/\/+$/, "");
+        let max = Number(randomImage.max) || 0;
+        if (max <= 0) {
+            try {
+                const res = await fetch(`${base}/count.json`, { cache: "no-store" });
+                if (res.ok) max = Number((await res.json())?.h) || 0;
+            } catch {}
+        }
+        if (max <= 0) return;
         for (const img of covers) {
-            const n = Math.floor(Math.random() * randomImage.max) + 1;
+            const n = Math.floor(Math.random() * max) + 1;
             img.src = `${base}/ri/h/${n}.webp`;
         }
     }

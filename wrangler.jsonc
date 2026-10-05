@@ -1,5 +1,15 @@
 {
+	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "peroe-blog",
 	"compatibility_date": "2025-08-11",
-	"pages_build_output_dir": "./dist"
+	"assets": {
+		"directory": "./dist",
+		"not_found_handling": "404-page"
+	},
+	"routes": [
+		{
+			"pattern": "blog.juluo.work",
+			"custom_domain": true
+		}
+	]
 }
