@@ -22,7 +22,6 @@
 		"ai-summary": "node scripts/generate-ai-summary.js",
 		"format": "biome format --write ./src",
 		"lint": "biome check --write ./src",
-		"postinstall": "patch-package",
 		"icon-subset": "node scripts/generate-icon-subset.mjs"
 	},
 	"dependencies": {
@@ -82,7 +81,6 @@
 		"markdown-it": "^14.1.0",
 		"mdast-util-to-string": "^4.0.0",
 		"node-html-parser": "^7.0.1",
-		"patch-package": "^8.0.1",
 		"postcss-import": "^16.1.0",
 		"postcss-nesting": "^13.0.1",
 		"reading-time": "^1.5.0",
@@ -94,10 +92,5 @@
 		"wrangler": "^4",
 		"zod": "^4"
 	},
-	"packageManager": "pnpm@9.14.4",
-	"pnpm": {
-		"patchedDependencies": {
-			"astro": "patches/astro.patch"
-		}
-	}
+	"packageManager": "pnpm@9.14.4"
 }
