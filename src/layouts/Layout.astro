@@ -7,7 +7,7 @@ import "../styles/main.css";
 import "../styles/markdown.css";
 import "../styles/markdown-extend.styl";
 
-import { profileConfig, siteConfig, umamiConfig } from "@/config";
+import { profileConfig, siteConfig, siteVerificationConfig, umamiConfig } from "@/config";
 import StaticBackground from "@components/StaticBackground.astro";
 import BodyThirdPartyScripts from "@components/layout/BodyThirdPartyScripts.astro";
 import DashLoaderScript from "@components/layout/DashLoaderScript.astro";
@@ -103,6 +103,17 @@ const bannerOffset =
 		<meta name="author" content={profileConfig.name}>
 		{siteConfig.keywords && (
 			<meta name="keywords" content={siteConfig.keywords.join(", ")}>
+		)}
+
+		{/* 搜索引擎站长验证（配置见 src/config.ts 的 siteVerificationConfig） */}
+		{siteVerificationConfig.bing && (
+			<meta name="msvalidate.01" content={siteVerificationConfig.bing} />
+		)}
+		{siteVerificationConfig.google && (
+			<meta name="google-site-verification" content={siteVerificationConfig.google} />
+		)}
+		{siteVerificationConfig.baidu && (
+			<meta name="baidu-site-verification" content={siteVerificationConfig.baidu} />
 		)}
 
 		<meta property="og:site_name" content={siteConfig.title}>

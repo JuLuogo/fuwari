@@ -140,6 +140,15 @@ export type CookieConsentConfig = {
 	language: string;
 };
 
+export type SiteVerificationConfig = {
+	/** Bing 站长验证（msvalidate.01） */
+	bing: string;
+	/** Google Search Console（google-site-verification） */
+	google: string;
+	/** 百度站长（baidu-site-verification） */
+	baidu: string;
+};
+
 export type AiInvolvementLevel = 1 | 2 | 3;
 
 export type BlogPostData = {

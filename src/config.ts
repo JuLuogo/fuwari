@@ -10,6 +10,7 @@ import type {
 	ProfileConfig,
 	RandomImageConfig,
 	SiteConfig,
+	SiteVerificationConfig,
 	UmamiConfig,
 	ViewCounterConfig,
 } from "./types/config";
@@ -211,6 +212,13 @@ export const giscusConfig: GiscusConfig = {
 	mapping: "pathname",
 	lang: "zh-CN",
 	theme: `https://${customDomain}/css/giscus.css`,
+};
+
+// 搜索引擎站长验证：填了就会在 <head> 输出对应 meta 标签
+export const siteVerificationConfig: SiteVerificationConfig = {
+	bing: "91E5B16A2CD2E86042B923AF197EC312",
+	google: "",
+	baidu: "",
 };
 
 // OneDrive / 对象存储文件索引（工具页的 OneDrive 标签页）：自建后填写
