@@ -17,6 +17,7 @@
 		"imgf": "node scripts/imgf.js",
 		"del-space": "node scripts/del-space.js",
 		"update-diff": "node scripts/update-diff.js",
+		"lock-post": "node scripts/lock-post.mjs",
 		"watermark": "node scripts/add-watermark.js",
 		"ai-summary": "node scripts/generate-ai-summary.js",
 		"format": "biome format --write ./src",

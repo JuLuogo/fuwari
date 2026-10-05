@@ -180,6 +180,7 @@ export default defineConfig({
 	vite: {
 		optimizeDeps: {
 			include: [
+				"@fancyapps/ui",
 				"markdown-it",
 				"prismjs",
 				"prismjs/components/prism-bash",

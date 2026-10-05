@@ -1,5 +1,6 @@
-﻿---
+---
 import { getSortedPosts } from "@utils/content-utils";
+import { publicPosts } from "@utils/post-visibility";
 import Icon from "@components/Icon.astro";
 import { render } from "astro:content";
 import { profileConfig, siteConfig, umamiConfig } from "../../config";
@@ -8,7 +9,8 @@ const config = profileConfig;
 const posts = await getSortedPosts();
 const totalPosts = posts.length;
 let totalWords = 0;
-for (const post of posts) {
+// 加密文章的正文不在产物里（也没有可统计的明文），全站字数必须排除它们
+for (const post of publicPosts(posts)) {
 	const { remarkPluginFrontmatter } = await render(post);
 	if (remarkPluginFrontmatter?.words) {
 		totalWords += remarkPluginFrontmatter.words;

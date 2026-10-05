@@ -65,5 +65,9 @@ _bmad-output/
 # 课表
 src/data/timetable/source/
 
+# ⚠️ 加密文章的明文与密码（只保留在本地，绝不提交）
+# 仓库里只提交 src/content/posts/<slug>.md 的 stub 与 src/data/encrypted/<slug>.json 密文
+private/
+
 #  Git Diff（构建时由 pnpm update-diff 生成）
 src/json/git-history.json

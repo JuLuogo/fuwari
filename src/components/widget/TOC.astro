@@ -1,4 +1,5 @@
 ---
+import { buildTocTree, renderTocListHtml } from "@utils/toc-utils";
 import type { MarkdownHeading } from "astro";
 import { siteConfig } from "../../config";
 import TOCList from "./TOCList.astro";
@@ -19,49 +20,7 @@ const className = Astro.props.class;
 
 const isPostsRoute = Astro.url.pathname.startsWith("/posts/");
 
-const removeTailingHash = (text: string) => {
-	let lastIndexOfHash = text.lastIndexOf("#");
-	if (lastIndexOfHash !== text.length - 1) {
-		return text;
-	}
-
-	return text.substring(0, lastIndexOfHash);
-};
-
-interface TocItem extends MarkdownHeading {
-	children: TocItem[];
-}
-
-function buildToc(headings: MarkdownHeading[]): TocItem[] {
-	const toc: TocItem[] = [];
-	const parentStack: TocItem[] = [];
-
-	for (const h of headings) {
-		const item: TocItem = {
-			...h,
-			text: removeTailingHash(h.text),
-			children: [],
-		};
-
-		while (
-			parentStack.length > 0 &&
-			parentStack[parentStack.length - 1].depth >= item.depth
-		) {
-			parentStack.pop();
-		}
-
-		if (parentStack.length > 0) {
-			parentStack[parentStack.length - 1].children.push(item);
-		} else {
-			toc.push(item);
-		}
-		parentStack.push(item);
-	}
-
-	return toc;
-}
-
-const toc = buildToc(headings);
+const toc = buildTocTree(headings);
 ---
 {isPostsRoute &&
 <table-of-contents class:list={[className, "group block relative z-0 bg-[var(--float-panel-bg-opaque)] rounded-xl p-2"]}>
@@ -71,6 +30,9 @@ const toc = buildToc(headings);
 </table-of-contents>}
 
 <script>
+import { buildTocTree, renderTocListHtml } from "@utils/toc-utils";
+import type { MarkdownHeading } from "astro";
+
 class TableOfContents extends HTMLElement {
     tocEl: HTMLElement | null = null;
     visibleClass = "visible";
@@ -263,4 +225,29 @@ class TableOfContents extends HTMLElement {
 if (!customElements.get("table-of-contents")) {
     customElements.define("table-of-contents", TableOfContents);
 }
+
+// 加密文章（PasswordGate）解锁后重建侧栏目录：
+// 服务端渲染时拿不到 headings（只能传 []，否则目录标题会泄露正文结构），
+// 解锁后用密文里带的 headings 重新生成与 TOCList.astro 同构的 DOM，并重新初始化自定义元素。
+function rebuildToc(headings: MarkdownHeading[]) {
+    const host = document.querySelector("table-of-contents");
+    if (!host) return;
+
+    // 只替换列表本身，保留 #active-indicator
+    host.querySelector("ol, ul")?.remove();
+    const html = renderTocListHtml(buildTocTree(headings));
+    if (html) host.insertAdjacentHTML("afterbegin", html);
+
+    const indicator = document.getElementById("active-indicator");
+    if (indicator) indicator.classList.toggle("hidden", headings.length === 0);
+
+    const el = host as HTMLElement & { init?: () => void; disconnectedCallback?: () => void };
+    el.disconnectedCallback?.();
+    el.init?.();
+}
+
+window.addEventListener("fuwari:toc-rebuild", ((event: Event) => {
+    const detail = (event as CustomEvent<{ headings?: MarkdownHeading[] }>).detail;
+    rebuildToc(detail?.headings ?? []);
+}) as EventListener);
 </script>

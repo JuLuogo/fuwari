@@ -9,8 +9,9 @@ interface SitemapPage {
 }
 
 export const GET: APIRoute = async () => {
+	// 加密文章不进站点地图（正文不对搜索引擎开放）
 	const posts = await getCollection("posts", ({ data }) => {
-		return !data.draft;
+		return !data.draft && data.encrypted !== true;
 	});
 
 	const staticPages: SitemapPage[] = [

@@ -18,6 +18,12 @@ const postsCollection = defineCollection({
 		pinned: z.boolean().optional().default(false),
 		ai_level: z.number().int().min(1).max(3).optional(),
 
+		/* 单篇文章密码保护：正文以密文形式放在 src/data/encrypted/<slug>.json，
+		   仓库里的 md 只是「frontmatter + 空正文」的 stub。
+		   密码本身不进仓库（明文与密码留在 gitignored 的 private/posts/），所以这里没有 password 字段。 */
+		encrypted: z.boolean().optional().default(false),
+		passwordHint: z.string().optional().default(""),
+
 		/* For internal use */
 		prevTitle: z.string().default(""),
 		prevSlug: z.string().default(""),

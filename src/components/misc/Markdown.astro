@@ -133,6 +133,11 @@ if (document.readyState === "loading") {
     initMarkdown();
 }
 
+// 加密文章解锁后正文是运行时注入的，需要在注入之后重跑一次表格包裹与 Mermaid 渲染
+window.addEventListener("fuwari:markdown-injected", () => {
+    initMarkdown();
+});
+
 document.addEventListener("click", function (e: MouseEvent) {
     const target = e.target as Element | null;
 

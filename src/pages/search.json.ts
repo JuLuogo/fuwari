@@ -1,4 +1,5 @@
 import { getSortedPosts } from "@/utils/content-utils";
+import { publicPosts } from "@/utils/post-visibility";
 import type { APIContext } from "astro";
 
 function toPlainText(markdown: string): string {
@@ -14,7 +15,8 @@ function toPlainText(markdown: string): string {
 }
 
 export async function GET(_context: APIContext): Promise<Response> {
-	const posts = await getSortedPosts();
+	// 加密文章必须排除：索引会把正文压成纯文本写进产物
+	const posts = publicPosts(await getSortedPosts());
 	const payload = posts.map((post) => ({
 		title: post.data.title || "",
 		description: post.data.description || "",

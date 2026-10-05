@@ -2,6 +2,7 @@ import { getImage } from "astro:assets";
 import { getCollection } from "astro:content";
 import { siteConfig } from "@/config";
 import { getSortedPosts } from "@/utils/content-utils";
+import { publicPosts } from "@/utils/post-visibility";
 import rss from "@astrojs/rss";
 import type { RSSFeedItem } from "@astrojs/rss";
 import type { APIContext, ImageMetadata } from "astro";
@@ -22,7 +23,8 @@ export async function GET(context: APIContext): Promise<Response> {
 	}
 
 	// Use the same ordering as site listing (pinned first, then by published desc)
-	const posts = await getSortedPosts();
+	// 加密文章必须排除：RSS 会把正文全文写进产物
+	const posts = publicPosts(await getSortedPosts());
 	const feed: RSSFeedItem[] = [];
 
 	for (const post of posts) {

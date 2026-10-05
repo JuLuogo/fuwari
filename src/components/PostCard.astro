@@ -6,6 +6,7 @@ import Icon from "@components/Icon.astro";
 
 import { randomImageConfig, umamiConfig } from "../config";
 import { formatPostDateForDisplay } from "../utils/date-utils";
+import { isEncrypted } from "../utils/post-visibility";
 import { getDir } from "../utils/url-utils";
 import PostMetadata from "./PostMeta.astro";
 import ImageWrapper from "./misc/ImageWrapper.astro";
@@ -42,6 +43,9 @@ const hasCover = image !== undefined && image !== null && image !== "";
 
 const coverWidth = "28%";
 
+// 加密文章：不显示 excerpt / 字数 / 阅读时长（都会泄露正文信息）
+const encrypted = isEncrypted(entry);
+
 const { remarkPluginFrontmatter } = await render(entry);
 ---
 <a
@@ -64,7 +68,7 @@ const { remarkPluginFrontmatter } = await render(entry);
 
         <!-- description -->
         <div class:list={["transition text-75 mb-3.5 pr-4 line-clamp-1 md:line-clamp-2"]}>
-            { description || remarkPluginFrontmatter.excerpt }
+            { encrypted ? "🔒 需要密码" : (description || remarkPluginFrontmatter.excerpt) }
         </div>
 
         <!-- metadata -->
@@ -78,12 +82,14 @@ const { remarkPluginFrontmatter } = await render(entry);
             class="mb-2 md:mb-4"
         ></PostMetadata>
 
-        <!-- word count, read time and page views -->
+        <!-- word count, read time and page views（加密文章不显示） -->
+        {!encrypted && (
         <div class="text-sm text-white/30 flex gap-4 transition">
             <div>{remarkPluginFrontmatter.words} 字</div>
             <div>|</div>
             <div>{remarkPluginFrontmatter.minutes} 分钟</div>
         </div>
+        )}
 
     </div>
 

@@ -5,10 +5,14 @@ import Markdown from "@components/misc/Markdown.astro";
 
 import AIInvolvementCard from "@components/widget/AIInvolvementCard.astro";
 import DiffDebugEditor from "@components/widget/DiffDebugEditor.astro";
+import PasswordGate from "@components/widget/PasswordGate.svelte";
 import PostUpdateNotice from "@components/widget/PostUpdateNotice.astro";
 import MainGridLayout from "@layouts/MainGridLayout.astro";
 import { getSortedPosts } from "@utils/content-utils";
+import { serializePayloadForHtml } from "@utils/encrypted-format";
+import { getEncryptedPayload } from "@utils/encrypted-payload";
 import { getCommitUrl, getPostHistory } from "@utils/git-history";
+import { isEncrypted } from "@utils/post-visibility";
 import { getDir, getPostUrlBySlug } from "@utils/url-utils";
 import Icon from "@components/Icon.astro";
 import { render } from "astro:content";
@@ -31,6 +35,12 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props;
 const { Content, headings, remarkPluginFrontmatter } = await render(entry);
+
+// 加密文章：正文以密文形式提交（src/data/encrypted/<slug>.json），
+// 服务端只输出密码框 + 内联载荷，绝不输出正文、excerpt、字数或目录标题。
+const encrypted = isEncrypted(entry);
+const payload = encrypted ? getEncryptedPayload(entry.id) : null;
+const tocHeadings = encrypted ? [] : headings;
 
 const history = getPostHistory(entry.id);
 const lastUpdateTime =
@@ -86,13 +96,14 @@ const jsonLd = [
 	},
 ];
 ---
-<MainGridLayout banner={entry.data.image} title={entry.data.title} description={entry.data.description} lang={entry.data.lang} setOGTypeArticle={true} ogImage={entry.data.image} headings={headings}>
+<MainGridLayout banner={entry.data.image} title={entry.data.title} description={entry.data.description} lang={entry.data.lang} setOGTypeArticle={true} ogImage={entry.data.image} headings={tocHeadings}>
     <script is:inline slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)}></script>
     <div class="flex w-full overflow-hidden relative mb-4">
         <div id="post-container" class:list={["card-base z-10 px-6 md:px-9 pt-6 pb-4 relative w-full",
             {}
         ]}>
-            <!-- word count and reading time -->
+            <!-- word count and reading time（加密文章不显示：字数与阅读时长会泄露正文规模） -->
+            {!encrypted && (
             <div class="flex flex-row text-white/30 gap-5 mb-3">
                 <div class="flex flex-row items-center">
                     <div class="h-6 w-6 rounded-md bg-white/10 text-white/50 flex items-center justify-center mr-2">
@@ -107,6 +118,7 @@ const jsonLd = [
                     <div class="text-sm">{remarkPluginFrontmatter.minutes} 分钟</div>
                 </div>
             </div>
+            )}
 
             <!-- title -->
             <div class="relative">                <div
@@ -123,11 +135,11 @@ const jsonLd = [
                 </div>
             </div>
 
-            <!-- description/excerpt -->
-            {(entry.data.description || remarkPluginFrontmatter.excerpt) && (
+            <!-- description/excerpt（加密文章只显示手写的 description，不输出正文 excerpt） -->
+            {(entry.data.description || (!encrypted && remarkPluginFrontmatter.excerpt)) && (
                 <div class="mb-4">
                     <div id="post-description" class="text-white/75 text-sm leading-relaxed">
-                        {entry.data.description || remarkPluginFrontmatter.excerpt}
+                        {entry.data.description || (!encrypted && remarkPluginFrontmatter.excerpt)}
                     </div>
                 </div>
             )}
@@ -163,7 +175,15 @@ const jsonLd = [
 			<PostUpdateNotice publishedAt={entry.data.published} lastUpdated={lastUpdateTime} />
 
             <Markdown class="mb-6 markdown-content">
-                <Content />
+                {encrypted && payload ? (
+                    <>
+                        {/* 加密载荷内联进页面：不含正文、不含密码，只有算法参数与密文 */}
+                        <script is:inline type="application/json" id="post-payload" set:html={serializePayloadForHtml(payload)}></script>
+                        <PasswordGate client:load hint={entry.data.passwordHint} />
+                    </>
+                ) : (
+                    <Content />
+                )}
             </Markdown>
 
             <!-- 文章反馈与编辑区域 -->
@@ -188,7 +208,8 @@ const jsonLd = [
                     </div>
                 </div>
                 
-                {gitHubEditConfig.enable && (
+                {/* 加密文章没有可公开的正文改动记录，也没有可编辑的正文（仓库里只有 stub），所以整块隐藏 */}
+                {gitHubEditConfig.enable && !encrypted && (
                     <>
                         <!-- 分隔线 -->
                         <div class="border-t border-[var(--line-divider)] my-3"></div>
