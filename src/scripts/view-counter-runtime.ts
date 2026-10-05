@@ -317,6 +317,8 @@ async function loadViews() {
 	const umami = await loadFromUmami(paths, setSiteViews);
 
 	// 2. Umami 没覆盖到的部分（含全站数字）才去问自建接口
+	//    ⚠️ 口径提醒：Umami 的「全站」是所有路径的 PV 合计，自建那边的 `/` 只是首页 PV。
+	//    所以 Umami 挂掉时侧栏这个数会明显变小（不是算错，是换了口径），这是有意的降级。
 	const missing = paths.filter(
 		(pathname) => umami?.paths[pathname] === undefined,
 	);
@@ -353,7 +355,6 @@ async function loadViews() {
 	window.dispatchEvent(
 		new CustomEvent(POST_VIEWS_EVENT, { detail: { views: posts } }),
 	);
-	(window as any).__VIEWS_FETCHED__ = true;
 }
 
 if (typeof window !== "undefined") {
