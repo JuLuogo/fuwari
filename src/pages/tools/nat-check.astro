@@ -1,19 +1,17 @@
 ---
 import { natCheckConfig } from "@/config";
-
-// 未配置后端时不暴露到工具列表（见 src/config.ts 的 natCheckConfig）
-export const toolMeta = natCheckConfig.enable
-	? {
-			title: "NAT 检测",
-			description: "高级 NAT 类型及连通性探测",
-			icon: "material-symbols:network-check-rounded",
-			order: 5,
-		}
-	: undefined;
-
 import NatCheck from "@components/NatCheck.svelte";
 import PageCardHeader from "@components/misc/PageCardHeader.astro";
 import MainGridLayout from "@layouts/MainGridLayout.astro";
+
+// 后端未配置时不在工具列表里展示（tools.astro 会跳过 enabled === false 的条目）
+export const toolMeta = {
+	title: "NAT 检测",
+	description: "高级 NAT 类型及连通性探测",
+	icon: "material-symbols:network-check-rounded",
+	order: 5,
+	enabled: natCheckConfig.enable,
+};
 
 const title = "NAT 类型检测";
 ---

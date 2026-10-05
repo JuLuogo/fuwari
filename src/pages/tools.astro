@@ -1,4 +1,4 @@
-﻿---
+---
 import MainGridLayout from "@layouts/MainGridLayout.astro";
 import Icon from "@components/Icon.astro";
 
@@ -10,6 +10,8 @@ const tools = Object.entries(toolPagesModules)
 	.map(([path, module]: [string, any]) => {
 		if (!module.toolMeta) return null;
 		const meta = module.toolMeta;
+		// enabled === false 的工具（例如后端未配置）不在列表里展示
+		if (meta.enabled === false) return null;
 		// 从文件路径提取路由路径
 		// path 格式: ./tools/cover.astro 或 ./tools/s/index.astro
 		const fileName = path.replace('./tools/', '').replace('.astro', '');
