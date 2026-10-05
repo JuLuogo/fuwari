@@ -80,7 +80,8 @@
 		"sanitize-html": "^2.16.0",
 		"stylus": "^0.64.0",
 		"typescript": "^5.8.3",
-		"unist-util-visit": "^5.0.0"
+		"unist-util-visit": "^5.0.0",
+		"wrangler": "^4"
 	},
 	"packageManager": "pnpm@9.14.4",
 	"pnpm": {

@@ -48,4 +48,6 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          # 必须用 wrangler 4：v3 不支持「纯静态资源」Worker（会报 Missing entry-point）
+          wranglerVersion: "4"
           command: deploy
