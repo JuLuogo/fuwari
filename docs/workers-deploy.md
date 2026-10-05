@@ -1,60 +1,60 @@
-# Workers 部署与 GitHub 自动构建
+# 部署方式
 
-本站与所有自建服务都跑在 **Cloudflare Workers** 上（不用 Pages）。
+本站与所有服务都跑在 **Cloudflare Workers** 上。仓库：<https://github.com/juluogo/fuwari>（`main` 分支）。
 
-## 一、当前已部署的 Workers
+## 一、自动部署（已配置 ✅）
 
-| Worker | 自定义域 | 说明 | 代码位置 |
-| --- | --- | --- | --- |
-| `peroe-blog` | `blog.juluo.work` | 博客本体（静态资源模式，`assets.directory=./dist`） | 本仓库根目录 `wrangler.jsonc` |
-| `cf-umami` | `t.juluo.work` | 访问量统计（D1 `cf-umami`） | `github.com/JuLuogo/cf-umami` |
-| `link-card` | `icon.juluo.work` | 链接卡片元数据 | 本仓库 `services/link-card/` |
-| `random-pic` | `p.juluo.work` | 随机图 API（R2 桶 `juluo`） | 本仓库 `services/random-pic/` |
+**推送到 `main` 就会自动构建并部署**，由 [`.github/workflows/deploy-workers.yml`](../.github/workflows/deploy-workers.yml) 完成：
 
-域内另有 Zone 级 301 规则：`juluo.work` 与 `www.juluo.work` → `https://blog.juluo.work`。
+```
+push main → pnpm install --frozen-lockfile → pnpm update-diff → pnpm astro build --force → wrangler deploy
+```
 
-## 二、GitHub 连接（自动构建，推荐）
+所需仓库 Secrets 已经写好了（Settings → Secrets and variables → Actions）：
 
-Workers 的 Git 连接目前只能在控制台点（API 未开放给本令牌），步骤：
+| Secret | 用途 |
+| --- | --- |
+| `CLOUDFLARE_API_TOKEN` | 部署 Worker |
+| `CLOUDFLARE_ACCOUNT_ID` | 目标账号 |
 
-1. 打开 <https://dash.cloudflare.com/?to=/:account/workers-and-pages>
-2. 点 **`peroe-blog`** → **Settings** → **Builds** → **Connect**
-3. 授权 GitHub，选择仓库 **`JuLuogo/fuwari`**、分支 **`main`**
-4. 构建配置填：
+也可以在仓库 **Actions → Deploy to Cloudflare Workers → Run workflow** 手动触发。
 
-   | 项目 | 值 |
-   | --- | --- |
-   | Build command | `pnpm install && pnpm update-diff && pnpm astro build --force` |
-   | Deploy command | `npx wrangler deploy` |
-   | Root directory | `/` |
-   | 环境变量（可选） | `NODE_VERSION=22`、`PNPM_VERSION=9` |
+> 为什么不直接用 Cloudflare 控制台的 Git 连接（Workers Builds）？
+> 那个连接只能在控制台点（Cloudflare API 的 `builds/workers*` 接口对当前令牌返回 401，无法自动化创建）。
+> 用 GitHub Actions 效果等价：推代码即上线。若你更喜欢控制台方案，步骤见文末。
 
-   > `pnpm update-diff` 必须保留：它会生成 `src/json/git-history.json`，缺了构建会报
-   > `Could not resolve "../json/git-history.json"`。
-5. 保存后推一次提交（或在 Builds 页面点 **Retry deployment**）验证。
-
-连接成功后，`git push` 到 `main` 就会自动构建并部署。
-
-## 三、手动部署（备用）
+## 二、手动部署（备用）
 
 ```powershell
 $env:CLOUDFLARE_API_TOKEN="<token>"
 $env:CLOUDFLARE_ACCOUNT_ID="fad9d9a55ea63ee5f0b0d1d227e99293"
 
-# 博客
-pnpm update-diff
+pnpm update-diff        # 生成 src/json/git-history.json（构建前置，缺了会报错）
 pnpm astro build --force
-npx wrangler deploy
-
-# 其他服务
-cd services/link-card  ; npx wrangler deploy
-cd services/random-pic ; npx wrangler deploy
+npx wrangler deploy     # 部署 Worker `peroe-blog`
 ```
 
-## 四、注意事项
+其他服务：
 
-- `wrangler.jsonc` 是 **Workers** 配置（有 `assets` 字段）；如果误加 `pages_build_output_dir`
-  会被当成 Pages 项目配置，`wrangler deploy` 会报 `does not support "assets"`。
-- 博客的静态资源直接随 Worker 上传（约 120 个文件），不需要对象存储。
-- 图片分两处放：随仓库的 `public/assets/images/`（跟随 Worker 部署），
-  以及随机图/画廊用的 R2 桶 `juluo`（`ri/h/*`、`ri/v/*`，见 `services/random-pic/README.md`）。
+```powershell
+cd services/link-card ; npx wrangler deploy   # icon.juluo.work
+# 访问量统计的代码在 https://github.com/JuLuogo/cf-umami（t.juluo.work）
+```
+
+## 三、注意事项
+
+- `wrangler.jsonc` 是 **Workers** 配置（`assets.directory = ./dist` + `routes` 自定义域），
+  不要再加 `pages_build_output_dir`，否则会被当成 Pages 项目配置而报错。
+- **`pnpm update-diff` 不能省**：它生成 `src/json/git-history.json`，缺失时构建会报
+  `Could not resolve "../json/git-history.json"`。
+- 大批量增删文章后要加 `--force`，否则 Astro 会用 `node_modules/.astro/data-store.json` 里的旧内容。
+- 文章配图直接放仓库（`public/assets/images/` 或文章同目录）随构建分发，不需要图床。
+
+## 四、附：用 Cloudflare 控制台连 Git（可选）
+
+1. <https://dash.cloudflare.com/?to=/:account/workers-and-pages> → **`peroe-blog`** → **Settings** → **Builds** → **Connect**
+2. 选仓库 `JuLuogo/fuwari`、分支 `main`
+3. Build command：`pnpm install && pnpm update-diff && pnpm astro build --force`
+   Deploy command：`npx wrangler deploy`
+
+> 两种方式同时开启会重复部署（一次来自 Actions，一次来自 Cloudflare），建议二选一。
