@@ -1,23 +1,56 @@
-// 浏览量的统一读取端：每个页面只发一次 POST /batch，同时把「全站访问量」与各篇文章的浏览量回填到 DOM。
+// 浏览量的统一读取端：**优先 Umami**（只读的分享接口），自建 Worker + D1 只做兜底。
 //
-// 需要展示哪些文章由页面自己登记：
-//   - 列表页：__PAGE_POSTS_DATA__（[...page].astro 注入的整页文章数据）
-//   - 其它页面：__VIEWS_QUEUE__（PostMeta 每渲染一次就 push 一个 slug）
-// 取数口径固定为 ["/", "/posts/<slug>/", ...]，响应里的第 0 项是全站访问量（即首页的 PV）。
+// 两个数据源：
+//   1. Umami Cloud（umamiConfig.shareApiBase + shareId，不需要任何密钥）
+//        - 全站：GET /api/websites/{id}/stats?startAt=0&endAt=<now>       -> pageviews（全时段 PV）
+//        - 单页：同上再加 &path=eq.%2Fposts%2Fxxx%2F                      -> 该路径的全时段 PV
+//        两个必需的请求头：x-umami-share-token（用 /api/share/{shareId} 换，10 分钟有效）
+//        和 x-umami-share-context（= shareId；umami 用它判断「token 确实用在分享上下文里」，
+//        少一个就是 401）。这套接口没有公开文档，参数是照着分享页抓包对出来的。
+//   2. 自建（viewCounterConfig.endpoint）：POST /batch，请求体是 pathname 数组
+//        —— 只在 Umami 整体不可用、或某些路径没取到数字时发，用来补缺口（不做加法，避免重复计数）。
 //
-// 写入端（上报）不在这里：各页面引用的 tracker.js 负责 POST /send，
-// 见 components/layout/BodyThirdPartyScripts.astro。只读不写的话所有数字都会恒为 0。
-import { viewCounterConfig } from "../config";
+// 页面侧只需要登记要显示什么：
+//   __VIEWS_QUEUE__  = 文章 slug 列表（PostMeta 渲染几张卡片就有几个）
+//   __VIEWS_PATHS__  = 任意页面路径（ViewsCounter，如 /cover/、/files/）
+// 数字拿到后：填 DOM + 广播 post-views-loaded 事件给排序脚本。
+import { umamiConfig, viewCounterConfig } from "../config";
 
 const SITE_VIEWS_EVENT = "site-views-loaded";
 const POST_VIEWS_EVENT = "post-views-loaded";
 const SITE_PATHNAME = "/";
 
+/** Umami 分享 token 的有效期是 10 分钟，缓存 8 分钟留余量 */
+const TOKEN_CACHE_KEY = "umami-share-token-v1";
+const TOKEN_TTL_MS = 8 * 60 * 1000;
+/** 单个请求的超时：Umami 慢过这个数就走兜底 */
+const REQUEST_TIMEOUT_MS = 6000;
+
 type ViewsMap = Record<string, number>;
 
-function getEndpoint(): string {
+type UmamiContext = {
+	token: string;
+	websiteId: string;
+	exp: number;
+};
+
+type PathRequest = {
+	pathname: string;
+	id: string;
+	suffix: string;
+};
+
+function getSelfHostedEndpoint(): string {
 	if (!viewCounterConfig.enable) return "";
 	return String(viewCounterConfig.endpoint ?? "")
+		.trim()
+		.replace(/\/+$/, "");
+}
+
+function getUmamiGateway(): string {
+	if (!viewCounterConfig.enable || !viewCounterConfig.preferUmami) return "";
+	if (!umamiConfig.enable || !umamiConfig.shareId) return "";
+	return String(umamiConfig.shareApiBase ?? "")
 		.trim()
 		.replace(/\/+$/, "");
 }
@@ -33,6 +66,206 @@ function collectSlugs(): string[] {
 		(slug): slug is string => typeof slug === "string" && slug.length > 0,
 	);
 	return [...new Set(slugs)];
+}
+
+function collectPathRequests(): PathRequest[] {
+	const raw: unknown = (window as any).__VIEWS_PATHS__;
+	if (!Array.isArray(raw)) return [];
+
+	const requests: PathRequest[] = [];
+	for (const item of raw as Partial<PathRequest>[]) {
+		if (typeof item?.pathname !== "string" || !item.pathname) continue;
+		if (typeof item?.id !== "string" || !item.id) continue;
+		requests.push({
+			pathname: item.pathname,
+			id: item.id,
+			suffix: typeof item.suffix === "string" ? item.suffix : "次",
+		});
+	}
+	return requests;
+}
+
+function postPathname(slug: string): string {
+	return `/posts/${slug}/`;
+}
+
+function toViews(value: unknown): number | undefined {
+	const num = Number(value);
+	return Number.isFinite(num) && num >= 0 ? num : undefined;
+}
+
+async function fetchWithTimeout(
+	url: string,
+	init: RequestInit = {},
+): Promise<Response> {
+	const controller = new AbortController();
+	const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+	try {
+		return await fetch(url, { ...init, signal: controller.signal });
+	} finally {
+		clearTimeout(timer);
+	}
+}
+
+function readTokenCache(): UmamiContext | null {
+	try {
+		const raw = sessionStorage.getItem(TOKEN_CACHE_KEY);
+		if (!raw) return null;
+		const cached = JSON.parse(raw) as UmamiContext;
+		if (!cached?.token || !cached.websiteId || Date.now() > cached.exp) {
+			return null;
+		}
+		return cached;
+	} catch {
+		return null;
+	}
+}
+
+function writeTokenCache(context: UmamiContext) {
+	try {
+		sessionStorage.setItem(TOKEN_CACHE_KEY, JSON.stringify(context));
+	} catch {
+		// 无痕模式等写不了就算了，下次重新换 token
+	}
+}
+
+function clearTokenCache() {
+	try {
+		sessionStorage.removeItem(TOKEN_CACHE_KEY);
+	} catch {
+		// ignore
+	}
+}
+
+async function getUmamiContext(force = false): Promise<UmamiContext | null> {
+	const gateway = getUmamiGateway();
+	if (!gateway) return null;
+
+	if (!force) {
+		const cached = readTokenCache();
+		if (cached) return cached;
+	}
+
+	try {
+		const res = await fetchWithTimeout(
+			`${gateway}/api/share/${encodeURIComponent(umamiConfig.shareId)}`,
+		);
+		if (!res.ok) return null;
+
+		const data = await res.json();
+		if (!data?.token || !data?.websiteId) return null;
+
+		const context: UmamiContext = {
+			token: String(data.token),
+			websiteId: String(data.websiteId),
+			exp: Date.now() + TOKEN_TTL_MS,
+		};
+		writeTokenCache(context);
+		return context;
+	} catch {
+		return null;
+	}
+}
+
+/** 读某个路径的全时段 PV；pathname 省略时读全站（不按路径过滤） */
+async function readUmamiViews(
+	context: UmamiContext,
+	pathname?: string,
+): Promise<number | undefined> {
+	const gateway = getUmamiGateway();
+	if (!gateway) return undefined;
+
+	const filter = pathname ? `&path=eq.${encodeURIComponent(pathname)}` : "";
+	const url = `${gateway}/api/websites/${context.websiteId}/stats?startAt=0&endAt=${Date.now()}${filter}`;
+
+	try {
+		const res = await fetchWithTimeout(url, {
+			headers: {
+				"x-umami-share-token": context.token,
+				"x-umami-share-context": umamiConfig.shareId,
+			},
+		});
+		if (res.status === 401) {
+			// token 过期：清缓存，让调用方换新的重试
+			clearTokenCache();
+			return undefined;
+		}
+		if (!res.ok) return undefined;
+
+		const data = await res.json();
+		return toViews(data?.pageviews);
+	} catch {
+		return undefined;
+	}
+}
+
+/** 优先数据源：Umami。整体不可用时返回 null */
+async function loadFromUmami(
+	pathnames: string[],
+	onSiteViews?: (views: number) => void,
+): Promise<{ site?: number; paths: ViewsMap } | null> {
+	const context = await getUmamiContext();
+	if (!context) return null;
+
+	const read = async (ctx: UmamiContext) => {
+		// 全站的这一次单独接出来：它一回来就先画侧栏，不用等最慢的那篇文章
+		const sitePromise = readUmamiViews(ctx).then((views) => {
+			if (views !== undefined) onSiteViews?.(views);
+			return views;
+		});
+		const [site, ...paths] = await Promise.all([
+			sitePromise,
+			...pathnames.map((pathname) => readUmamiViews(ctx, pathname)),
+		]);
+
+		const map: ViewsMap = {};
+		pathnames.forEach((pathname, index) => {
+			const views = paths[index];
+			if (views !== undefined) map[pathname] = views;
+		});
+		return { site, paths: map };
+	};
+
+	let result = await read(context);
+
+	// 一个都没读到，多半是 token 刚好过期：换新的再试一次
+	if (result.site === undefined && Object.keys(result.paths).length === 0) {
+		const fresh = await getUmamiContext(true);
+		if (!fresh) return null;
+		result = await read(fresh);
+		if (result.site === undefined && Object.keys(result.paths).length === 0) {
+			return null;
+		}
+	}
+
+	return result;
+}
+
+/** 兜底数据源：自建 Worker + D1 */
+async function loadFromSelfHosted(pathnames: string[]): Promise<ViewsMap | null> {
+	const endpoint = getSelfHostedEndpoint();
+	if (!endpoint || pathnames.length === 0) return null;
+
+	try {
+		const res = await fetchWithTimeout(`${endpoint}/batch`, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(pathnames),
+		});
+		if (!res.ok) return null;
+
+		const views: unknown = await res.json();
+		if (!Array.isArray(views)) return null;
+
+		const map: ViewsMap = {};
+		pathnames.forEach((pathname, index) => {
+			const value = toViews(views[index]);
+			if (value !== undefined) map[pathname] = value;
+		});
+		return map;
+	} catch {
+		return null;
+	}
 }
 
 function setSiteViews(views: number) {
@@ -59,45 +292,71 @@ function setPostViews(slug: string, views: number) {
 	}
 }
 
-async function loadViews() {
-	const endpoint = getEndpoint();
-	if (!endpoint) return;
-
-	const slugs = collectSlugs();
-	const pathnames = [SITE_PATHNAME, ...slugs.map((slug) => `/posts/${slug}/`)];
-
-	try {
-		const res = await fetch(`${endpoint}/batch`, {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify(pathnames),
-		});
-		if (!res.ok) return;
-
-		const views: unknown = await res.json();
-		if (!Array.isArray(views)) return;
-
-		setSiteViews(Number(views[0]) || 0);
-
-		const map: ViewsMap = {};
-		slugs.forEach((slug, index) => {
-			const count = Number(views[index + 1]) || 0;
-			map[slug] = count;
-			setPostViews(slug, count);
-		});
-
-		(window as any).__POST_VIEWS__ = map;
-		window.dispatchEvent(
-			new CustomEvent(POST_VIEWS_EVENT, { detail: { views: map } }),
-		);
-	} catch {
-		// 请求失败就保持隐藏：宁可什么都不显示，也不显示一个假的 0
-	} finally {
-		(window as any).__VIEWS_FETCHED__ = true;
+function setPathViews(request: PathRequest, views: number) {
+	const element = document.getElementById(request.id);
+	const wrapper = document.getElementById(`${request.id}-wrapper`);
+	if (element && wrapper) {
+		element.textContent = `${views} ${request.suffix}`;
+		wrapper.style.display = "flex";
 	}
 }
 
+async function loadViews() {
+	if (!getSelfHostedEndpoint() && !getUmamiGateway()) return;
+
+	const slugs = collectSlugs();
+	const pathRequests = collectPathRequests();
+	const paths = [
+		...new Set([
+			...slugs.map(postPathname),
+			...pathRequests.map((item) => item.pathname),
+		]),
+	];
+
+	// 1. 优先 Umami（侧栏数字一回来就先画）
+	const umami = await loadFromUmami(paths, setSiteViews);
+
+	// 2. Umami 没覆盖到的部分（含全站数字）才去问自建接口
+	const missing = paths.filter(
+		(pathname) => umami?.paths[pathname] === undefined,
+	);
+	const selfHosted =
+		umami?.site === undefined || missing.length > 0
+			? await loadFromSelfHosted([
+					...(umami?.site === undefined ? [SITE_PATHNAME] : []),
+					...missing,
+				])
+			: null;
+
+	// 3. 合并渲染：Umami 优先，自建只补缺口（Umami 的全站数字上面已经画过了）
+	if (umami?.site === undefined && selfHosted?.[SITE_PATHNAME] !== undefined) {
+		setSiteViews(selfHosted[SITE_PATHNAME]);
+	}
+
+	const all: ViewsMap = { ...(selfHosted ?? {}), ...(umami?.paths ?? {}) };
+
+	const posts: ViewsMap = {};
+	for (const slug of slugs) {
+		const views = all[postPathname(slug)];
+		if (views !== undefined) {
+			posts[slug] = views;
+			setPostViews(slug, views);
+		}
+	}
+
+	for (const request of pathRequests) {
+		const views = all[request.pathname];
+		if (views !== undefined) setPathViews(request, views);
+	}
+
+	(window as any).__POST_VIEWS__ = posts;
+	window.dispatchEvent(
+		new CustomEvent(POST_VIEWS_EVENT, { detail: { views: posts } }),
+	);
+	(window as any).__VIEWS_FETCHED__ = true;
+}
+
 if (typeof window !== "undefined") {
-	// 本脚本是模块（defer），执行时 DOM 已解析完，PostMeta 的内联登记脚本也已跑过
+	// 本脚本是模块（defer），执行时 DOM 已解析完，PostMeta / ViewsCounter 的登记脚本也已跑过
 	void loadViews();
 }

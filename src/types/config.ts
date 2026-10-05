@@ -96,11 +96,20 @@ export type UmamiConfig = {
 	timezone: string;
 	/** "none" 直出官方代码 / "strictly-necessary" 立即执行 / "tracking" 需用户同意后加载 */
 	consentLevel: "none" | "strictly-necessary" | "tracking";
+	/**
+	 * 分享数据的只读网关（浏览量读取端优先从这里取数）。
+	 * Umami 分享页自己就在打这个域：美国区是 https://gateway-us.umami.is；
+	 * 留空则不启用「优先 Umami」，直接走 viewCounterConfig.endpoint。
+	 */
+	shareApiBase?: string;
 };
 
 export type ViewCounterConfig = {
 	enable: boolean;
+	/** 兜底数据源：自建 Worker + D1 的接口地址 */
 	endpoint: string;
+	/** 优先读 Umami 的分享接口（只读、无需密钥），失败或查不到时回落到 endpoint */
+	preferUmami?: boolean;
 };
 
 export type RandomImageConfig = {

@@ -1,6 +1,6 @@
 ---
 import Icon from "@components/Icon.astro";
-import { viewCounterConfig } from "../config";
+import { isViewCounterEnabled } from "../utils/view-counter";
 
 type Props = {
 	pathname: string;
@@ -11,9 +11,7 @@ type Props = {
 const { pathname, suffix = "次" } = Astro.props;
 const id =
 	Astro.props.id ?? `page-views-${pathname.replace(/[^a-zA-Z0-9]+/g, "-")}`;
-const enabled =
-	viewCounterConfig.enable && viewCounterConfig.endpoint.trim() !== "";
-const endpoint = viewCounterConfig.endpoint.replace(/\/+$/, "");
+const enabled = isViewCounterEnabled();
 ---
 
 {enabled && (
@@ -24,30 +22,12 @@ const endpoint = viewCounterConfig.endpoint.replace(/\/+$/, "");
 	<span class="text-50 text-sm font-medium" id={id}></span>
 </div>
 
-<script define:vars={{ pathname, id, suffix, endpoint }}>
-	async function loadViews() {
-		const wrapper = document.getElementById(`${id}-wrapper`);
-		const el = document.getElementById(id);
-		if (!el || !wrapper) return;
-
-		try {
-			const res = await fetch(
-				`${endpoint}/share?pathname=${encodeURIComponent(pathname)}`,
-			);
-			if (!res.ok) return;
-
-			const data = await res.json();
-			const views = data?.views || 0;
-
-			el.textContent = `${views} ${suffix}`;
-			wrapper.style.display = 'flex';
-		} catch {
-			// 请求失败，保持隐藏
-		}
+<script is:inline define:vars={{ pathname, id, suffix }}>
+	// 只登记「本页要显示浏览量的路径」，取数由 view-counter-runtime.ts 统一负责：
+	// 优先 Umami 分享接口，失败或查不到时回落到自建接口（POST /batch）。
+	window.__VIEWS_PATHS__ = window.__VIEWS_PATHS__ || [];
+	if (!window.__VIEWS_PATHS__.some(function (item) { return item.id === id; })) {
+		window.__VIEWS_PATHS__.push({ pathname: pathname, id: id, suffix: suffix });
 	}
-
-	if (document.readyState === "loading")
-		document.addEventListener("DOMContentLoaded", loadViews);
-	else loadViews();
 </script>
 )}

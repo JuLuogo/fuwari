@@ -1,9 +1,8 @@
 ---
 import Icon from "@components/Icon.astro";
 
-import { umamiConfig, viewCounterConfig } from "../config";
 import { formatPostDateForDisplay } from "../utils/date-utils";
-import { url, getDir } from "../utils/url-utils";
+import { isViewCounterEnabled } from "../utils/view-counter";
 
 interface Props {
 	class: string;
@@ -68,10 +67,10 @@ const className = Astro.props.class;
     )}
 </div>
 
-{slug && viewCounterConfig.enable && viewCounterConfig.endpoint.trim() !== "" && (
+{slug && isViewCounterEnabled() && (
     <script is:inline define:vars={{ slug }}>
-    // 只登记「本页需要展示浏览量」的文章，真正的批量请求由 view-counter-runtime.ts 统一发起：
-    // 一个页面（哪怕有几张卡片）只发一次 POST /batch，顺带把全站访问量也取回来。
+    // 只登记「本页需要展示浏览量」的文章，真正的取数由 view-counter-runtime.ts 统一负责：
+    // 优先 Umami 分享接口，失败或查不到时回落到自建接口（POST /batch）。
     window.__VIEWS_QUEUE__ = window.__VIEWS_QUEUE__ || [];
     if (!window.__VIEWS_QUEUE__.includes(slug)) {
         window.__VIEWS_QUEUE__.push(slug);

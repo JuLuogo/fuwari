@@ -44,7 +44,7 @@ const breadcrumbSchema = {
 
 			<h2>一、我们收集什么</h2>
 			<ul>
-				<li><strong>访问统计</strong>：本站使用 <a href="https://umami.is" target="_blank" rel="noopener noreferrer">Umami</a> 进行匿名访问统计，不写入 Cookie、不做跨站追踪，仅记录页面路径、来源、浏览器与地区等聚合信息，无法用于识别个人身份。</li>
+				<li><strong>访问统计</strong>：本站使用 <a href="https://umami.is" target="_blank" rel="noopener noreferrer">Umami</a> 进行匿名访问统计，不写入 Cookie、不做跨站追踪，仅记录页面路径、来源、浏览器与地区等聚合信息，无法用于识别个人身份。页面上的浏览量数字就是向 Umami 的公开分享接口读取的聚合结果（只取页面浏览量总数，不含任何访客标识）；另外本站还有一个自建的计数服务（Cloudflare Worker + D1），只按页面路径累加次数，同样不记录 IP、UA 与 Cookie，仅在 Umami 读取失败时作为兜底显示。</li>
 				<li><strong>评论</strong>：文章评论由 <a href="https://giscus.app" target="_blank" rel="noopener noreferrer">Giscus</a> 提供，内容存储在 GitHub Discussions。使用评论需要登录 GitHub，你的头像与用户名会随评论展示，相关数据受 <a href="https://docs.github.com/site-policy/privacy-policies/github-privacy-statement" target="_blank" rel="noopener noreferrer">GitHub 隐私声明</a>约束。</li>
 				<li><strong>服务器日志</strong>：本站部署在 Cloudflare 上，访问时会产生常规访问日志（IP、时间、请求路径等），用于安全防护与故障排查。</li>
 				<li><strong>头像与图片</strong>：个人头像等静态资源可能由第三方图床（如 QQ 头像服务）提供，加载时会向对应服务发起请求。</li>

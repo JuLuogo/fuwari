@@ -169,12 +169,17 @@ export const umamiConfig: UmamiConfig = {
 	websiteId: "842d980c-5e11-4834-a2a8-5daaa285ce66",
 	timezone: "Asia/Shanghai",
 	consentLevel: "none",
+	// 分享数据的只读网关：浏览量读取端优先从这里取数（分享页自己就在打这个域）
+	// 美国区 = gateway-us.umami.is；换区时打开自己的分享页，看它请求的是哪个域
+	shareApiBase: "https://gateway-us.umami.is",
 };
 
-// 文章/页面浏览量：自建统计服务（Cloudflare Worker + D1，部署在 t.juluo.work）
+// 文章/页面浏览量：优先读 Umami（它从建站起就在记，数据是连续的），
+// 自建 Worker + D1（t.juluo.work）作为兜底——Umami 接口失败或查不到这个路径时才会用到。
 export const viewCounterConfig: ViewCounterConfig = {
 	enable: true,
 	endpoint: "https://t.juluo.work",
+	preferUmami: true,
 };
 
 // 随机图 API：使用现成的静态随机图服务（图片全在边缘节点，不占本站请求额度）
