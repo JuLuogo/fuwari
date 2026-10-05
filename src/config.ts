@@ -205,7 +205,7 @@ export const cookieConsentConfig: CookieConsentConfig = {
 // Giscus 评论：仓库需开启 Discussions，并在仓库上安装 GitHub App https://github.com/apps/giscus
 export const giscusConfig: GiscusConfig = {
 	enable: true,
-	repo: "juluogo/giscus",
+	repo: "juluowork/giscus",
 	repoId: "R_kgDOPdSugg",
 	category: "Announcements",
 	categoryId: "DIC_kwDOPdSugs4CuINO",
@@ -229,7 +229,7 @@ export const oneDriveConfig: OneDriveConfig = {
 
 export const gitHubEditConfig: GitHubEditConfig = {
 	enable: true,
-	baseUrl: "https://github.com/juluogo/fuwari/blob/main/src/content/posts",
+	baseUrl: "https://github.com/juluowork/fuwari/blob/main/src/content/posts",
 };
 
 // todoConfig removed from here

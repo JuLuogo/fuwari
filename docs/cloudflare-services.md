@@ -11,7 +11,7 @@
 | --- | --- | --- | --- |
 | `blog.juluo.work` | 博客本体 | Worker `peroe-blog`（静态资源模式，`assets.directory = ./dist`） | ✅ |
 | `juluo.work` / `www.juluo.work` | 301 → 博客 | Zone 动态跳转规则 | ✅ |
-| `t.juluo.work` | 访问量统计 | Worker `cf-umami` + D1 `cf-umami`（fork: [JuLuogo/cf-umami](https://github.com/JuLuogo/cf-umami)，已修 `/share` 的 CORS） | ✅ |
+| `t.juluo.work` | 访问量统计 | Worker `cf-umami` + D1 `cf-umami`（fork: [juluowork/cf-umami](https://github.com/juluowork/cf-umami)，已修 `/share` 的 CORS） | ✅ |
 | `icon.juluo.work` | 链接卡片元数据 `?url=` | Worker `link-card`，代码在 `services/link-card/` | ✅ |
 
 **不使用**的服务（保持站点轻量）：

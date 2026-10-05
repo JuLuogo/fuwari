@@ -10,7 +10,7 @@
 ## Cloudflare 侧怎么连（一次配置，之后全自动）
 
 1. Workers & Pages → `peroe-blog` → **Settings → Builds → Connect**
-2. 仓库选 `JuLuogo/fuwari`，分支选 **`dist`**
+2. 仓库选 `juluowork/fuwari`，分支选 **`dist`**
 3. **Build command 留空**（产物已经构建好了）
 4. Deploy command 保持默认 **`npx wrangler deploy`**
 5. 保存

@@ -1,6 +1,6 @@
 # 部署方式
 
-本站与所有服务都跑在 **Cloudflare Workers** 上。仓库：<https://github.com/juluogo/fuwari>（`main` 分支）。
+本站与所有服务都跑在 **Cloudflare Workers** 上。仓库：<https://github.com/juluowork/fuwari>（`main` 分支）。
 
 目前有**两条并行的部署路径**，都在推送 `main` 后自动完成：
 
@@ -27,7 +27,7 @@ README.md        说明
 Cloudflare 侧连接步骤（**Build command 留空**，因为它不需要构建）：
 
 1. <https://dash.cloudflare.com/?to=/:account/workers-and-pages> → **`peroe-blog`** → **Settings** → **Builds** → **Connect**
-2. Git 仓库选 `JuLuogo/fuwari`，**分支选 `dist`**（不是 main）
+2. Git 仓库选 `juluowork/fuwari`，**分支选 `dist`**（不是 main）
 3. **Build command 留空**
 4. Deploy command 保持默认 `npx wrangler deploy`
 5. 保存
@@ -69,7 +69,7 @@ node scripts/publish-artifact.mjs --branch dist --remote origin
 
 ```powershell
 cd services/link-card ; npx wrangler deploy   # icon.juluo.work
-# 访问量统计代码在 https://github.com/JuLuogo/cf-umami（t.juluo.work）
+# 访问量统计代码在 https://github.com/juluowork/cf-umami（t.juluo.work）
 ```
 
 ## 四、注意事项
