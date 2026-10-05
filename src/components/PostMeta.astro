@@ -69,58 +69,12 @@ const className = Astro.props.class;
 </div>
 
 {slug && viewCounterConfig.enable && viewCounterConfig.endpoint.trim() !== "" && (
-    <script is:inline define:vars={{ slug, viewsEndpoint: viewCounterConfig.endpoint.replace(/\/+$/, "") }}>
-    // 注册需要获取访问量的文章
-    if (!window.__VIEWS_QUEUE__) {
-        window.__VIEWS_QUEUE__ = [];
-        window.__VIEWS_FETCHED__ = false;
-    }
-    window.__VIEWS_QUEUE__.push(slug);
-
-    // 批量获取访问量
-    async function batchFetchPageViews() {
-        // 如果已经获取过或者有排序脚本在处理，跳过
-        if (window.__VIEWS_FETCHED__ || window.__PAGE_POSTS_DATA__) return;
-        window.__VIEWS_FETCHED__ = true;
-
-        const slugs = window.__VIEWS_QUEUE__;
-        if (!slugs.length) return;
-
-        try {
-            const pathnames = slugs.map(s => `/posts/${s}/`);
-            const response = await fetch(`${viewsEndpoint}/batch`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(pathnames),
-            });
-
-            if (!response.ok) return;
-
-            const views = await response.json();
-
-            // 更新所有文章的访问量
-            slugs.forEach((slug, index) => {
-                const wrapper = document.getElementById(`page-views-wrapper-${slug}`);
-                const viewsElement = document.getElementById(`page-views-${slug}`);
-                if (wrapper && viewsElement) {
-                    const pageViews = views[index] || 0;
-                    viewsElement.textContent = `${pageViews} 次`;
-                    wrapper.style.display = 'flex';
-                }
-            });
-        } catch (error) {
-            // 请求失败，保持隐藏
-        }
-    }
-
-    // 页面加载完成后获取统计数据
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', batchFetchPageViews);
-    } else {
-        // 使用 setTimeout 确保所有组件都注册完成
-        setTimeout(batchFetchPageViews, 0);
+    <script is:inline define:vars={{ slug }}>
+    // 只登记「本页需要展示浏览量」的文章，真正的批量请求由 view-counter-runtime.ts 统一发起：
+    // 一个页面（哪怕有几张卡片）只发一次 POST /batch，顺带把全站访问量也取回来。
+    window.__VIEWS_QUEUE__ = window.__VIEWS_QUEUE__ || [];
+    if (!window.__VIEWS_QUEUE__.includes(slug)) {
+        window.__VIEWS_QUEUE__.push(slug);
     }
 </script>
 )}

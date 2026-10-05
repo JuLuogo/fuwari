@@ -1,5 +1,5 @@
 ---
-import { cookieConsentConfig, umamiConfig } from "@/config";
+import { cookieConsentConfig, umamiConfig, viewCounterConfig } from "@/config";
 ---
 
 <script type="text/javascript">
@@ -151,6 +151,19 @@ import { cookieConsentConfig, umamiConfig } from "@/config";
 	});
 })();
 </script>
+
+<!-- 浏览量上报（自建服务 t.juluo.work，见 src/config.ts 的 viewCounterConfig）
+     tracker.js 在每次页面浏览时按 location.pathname 向 /send 报一次；它只记路径计数，
+     不带 Cookie、不传 UA/IP，所以和 Umami 一样不受 Cookie 同意横幅拦截。
+     ⚠️ 这里只负责「写」：不引它的话 D1 里永远是空的，前台所有数字都会是 0。
+     读回并渲染由 src/scripts/view-counter-runtime.ts 负责。 -->
+{viewCounterConfig.enable && viewCounterConfig.endpoint.trim() !== "" && (
+	<script
+		is:inline
+		defer
+		src={`${viewCounterConfig.endpoint.replace(/\/+$/, "")}/tracker.js`}
+	></script>
+)}
 
 <!-- Umami 统计（Umami Cloud，配置见 src/config.ts 的 umamiConfig）
      consentLevel = "none" 时直出官方追踪代码；否则交给 Cookie 同意横幅按类别执行 -->

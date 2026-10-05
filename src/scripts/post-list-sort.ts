@@ -1,5 +1,5 @@
 // 文章列表客户端排序（仅当前页面内排序）
-import { viewCounterConfig } from "../config";
+// 浏览量数据来自 view-counter-runtime.ts 的 "post-views-loaded" 事件（本文件不再自己发请求）
 
 interface PostData {
 	id: string;
@@ -29,7 +29,7 @@ class PostListManager {
 		this.posts = (window as any).__PAGE_POSTS_DATA__ || [];
 		this.cacheArticles();
 		this.bindEvents();
-		this.loadViewsData();
+		this.subscribeViewsData();
 	}
 
 	private cacheArticles() {
@@ -39,78 +39,29 @@ class PostListManager {
 		this.articles = Array.from(container.querySelectorAll("article"));
 	}
 
-	private async loadViewsData() {
-		// 未启用浏览量服务时直接按 0 处理，不发起外部请求
-		const viewsEndpoint = viewCounterConfig.enable
-			? viewCounterConfig.endpoint.replace(/\/+$/, "")
-			: "";
-
-		// 批量获取所有文章的访问量（包含全站访问量）
-		try {
-			if (!viewsEndpoint) throw new Error("view counter disabled");
-			const pathnames = ["/", ...this.posts.map((post) => `/posts/${post.id}/`)];
-			
-			const res = await fetch(`${viewsEndpoint}/batch`, {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(pathnames),
-			});
-
-			if (res.ok) {
-				const text = await res.text();
-				
-				if (!text || text.trim() === '') {
-					throw new Error('Empty response');
-				}
-				
-				const views: number[] = JSON.parse(text);
-				
-				// 第一个是全站访问量，存储到全局变量
-				const siteViews = views[0] || 0;
-				(window as any).__SITE_VIEWS__ = siteViews;
-				
-				// 触发自定义事件通知其他组件
-				window.dispatchEvent(new CustomEvent('site-views-loaded', { detail: { views: siteViews } }));
-				
-				const viewsElement = document.getElementById("site-views");
-				const wrapper = document.getElementById("site-views-wrapper");
-				if (viewsElement && wrapper) {
-					viewsElement.textContent = siteViews.toString();
-					wrapper.style.display = "grid";
-				}
-				
-				// 后续是文章访问量
-				this.posts.forEach((post, index) => {
-					const viewCount = views[index + 1] || 0;
-					this.viewsData.set(post.id, viewCount);
-					
-					// 同时更新 PostMeta 组件的显示
-					const postWrapper = document.getElementById(`page-views-wrapper-${post.id}`);
-					const postViewsElement = document.getElementById(`page-views-${post.id}`);
-					if (postWrapper && postViewsElement) {
-						postViewsElement.textContent = `${viewCount} 次`;
-						postWrapper.style.display = 'flex';
-					}
-				});
-			} else {
-				// 请求失败，所有文章默认为 0
-				this.posts.forEach((post) => {
-					this.viewsData.set(post.id, 0);
-				});
+	// 浏览量统一由 view-counter-runtime.ts 拉取（每页一次 POST /batch），这里只消费结果
+	private subscribeViewsData() {
+		const apply = (views: Record<string, number>) => {
+			for (const post of this.posts) {
+				this.viewsData.set(post.id, Number(views?.[post.id]) || 0);
 			}
-		} catch (e) {
-			// 请求失败，所有文章默认为 0
-			this.posts.forEach((post) => {
-				this.viewsData.set(post.id, 0);
-			});
+			this.viewsLoaded = true;
+			if (this.currentSort === "views") this.render();
+		};
+
+		const ready = (window as any).__POST_VIEWS__;
+		if (ready) {
+			apply(ready);
+			return;
 		}
 
-		this.viewsLoaded = true;
-		// 标记访问量已加载，防止 PostMeta 重复请求
-		(window as any).__VIEWS_FETCHED__ = true;
-		(window as any).__SITE_VIEWS_LOADED__ = true;
+		window.addEventListener(
+			"post-views-loaded",
+			((e: Event) => {
+				apply((e as CustomEvent).detail?.views ?? {});
+			}) as EventListener,
+			{ once: true },
+		);
 	}
 
 	private bindEvents() {
@@ -137,17 +88,12 @@ class PostListManager {
 	private setSort(type: SortType) {
 		if (this.currentSort !== type) {
 			this.currentSort = type;
-			
-			// 如果切换到访问量排序但数据还未加载完成，等待加载
-			if (type === "views" && !this.viewsLoaded) {
-				const checkInterval = setInterval(() => {
-					if (this.viewsLoaded) {
-						clearInterval(checkInterval);
-						this.render();
-					}
-				}, 100);
-			} else {
+			// 访问量还没回来时先不动 DOM（此时排序结果全是 0，排了也没意义）：
+			// subscribeViewsData() 拿到数据后会补一次渲染
+			if (type !== "views" || this.viewsLoaded) {
 				this.render();
+			} else {
+				this.updateSortControls();
 			}
 		}
 	}
