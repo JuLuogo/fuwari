@@ -24,7 +24,7 @@ import { randomImageConfig } from "@/config";
 
 		<div class="text-sm text-50 mb-5 leading-relaxed">
 			{randomImageConfig.enable && randomImageConfig.baseUrl ? (
-				<>图片二进制自托管于： <a href={randomImageConfig.baseUrl} target="_blank" rel="noopener noreferrer" class="font-medium text-75 hover:text-[var(--primary)] transition-colors">{randomImageConfig.baseUrl}</a></>
+				<>随机图来源： <a href={randomImageConfig.baseUrl} target="_blank" rel="noopener noreferrer" class="font-medium text-75 hover:text-[var(--primary)] transition-colors">{randomImageConfig.baseUrl}</a></>
 			) : (
 				<>尚未配置随机图 API（在 <code class="px-1 bg-black/20 rounded">src/config.ts</code> 的 <code class="px-1 bg-black/20 rounded">randomImageConfig</code> 中填写自建地址后即可显示画廊）</>
 			)}
@@ -53,17 +53,28 @@ import { randomImageConfig } from "@/config";
 		}
 	</style>
 
+	<script is:inline define:vars={{ galleryConfig: randomImageConfig }}>
+		window.__GALLERY_CONFIG__ = galleryConfig;
+	</script>
+
 	<script>
 		import Masonry from "masonry-layout";
 		import imagesLoaded from "imagesloaded";
 		import { Fancybox } from "@fancyapps/ui";
 		import { fancyboxOptions as baseOptions } from "@utils/fancybox";
 
-		const GALLERY_BASE = randomImageConfig.enable
-			? randomImageConfig.baseUrl.replace(/\/+$/, "")
+		// 由 define:vars 注入（见页面顶部的 inline script），避免直接引用前端变量
+		const GALLERY_CONFIG = window.__GALLERY_CONFIG__ || { enable: false, baseUrl: "", max: 0, maxVertical: 0 };
+		const GALLERY_BASE = GALLERY_CONFIG.enable
+			? String(GALLERY_CONFIG.baseUrl || "").replace(/\/+$/, "")
 			: "";
 		const COUNT_JSON_URL = GALLERY_BASE ? `${GALLERY_BASE}/count.json` : "";
 		const DOMAIN = GALLERY_BASE;
+		// 外部静态随机图服务没有 /count.json 时，用配置里的数量兜底
+		const FALLBACK_COUNTS = {
+			h: Number(GALLERY_CONFIG.max) || 0,
+			v: Number(GALLERY_CONFIG.maxVertical) || 0,
+		};
 
 		let counts = { h: 0, v: 0 };
 		let currentType = "h";
@@ -127,19 +138,18 @@ import { randomImageConfig } from "@/config";
 
 		async function fetchCounts() {
 			try {
-				if (!COUNT_JSON_URL) throw new Error("random image api disabled");
+				if (!COUNT_JSON_URL) throw new Error("count.json 未配置");
 				const res = await fetch(COUNT_JSON_URL, { cache: "no-store" });
 				if (!res.ok) throw new Error(String(res.status));
 				const parsed = await res.json();
-				const h = Number(parsed.h || 0);
-				const v = Number(parsed.v || 0);
-				if (!Number.isFinite(h) || !Number.isFinite(v)) throw new Error("counts invalid");
+				const h = Number(parsed.h ?? FALLBACK_COUNTS.h) || 0;
+				const v = Number(parsed.v ?? FALLBACK_COUNTS.v) || 0;
 				counts = { h, v };
-				updateStatus();
-			} catch (e) {
-				counts = { h: 0, v: 0 };
-				updateStatus();
+			} catch {
+				// 该服务没有 count.json：用 config.ts 里实测的数量
+				counts = { ...FALLBACK_COUNTS };
 			}
+			updateStatus();
 		}
 
 		function resetIndex() {

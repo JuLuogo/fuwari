@@ -5,7 +5,6 @@ import type {
 	ImageFallbackConfig,
 	LicenseConfig,
 	LinkCardApiConfig,
-	NatCheckConfig,
 	NavBarConfig,
 	OneDriveConfig,
 	ProfileConfig,
@@ -177,12 +176,14 @@ export const viewCounterConfig: ViewCounterConfig = {
 	endpoint: "https://t.juluo.work",
 };
 
-// 随机图 API：自建 Worker 部署在 p.juluo.work（代码见 services/random-pic），
-// 图片放在 R2 桶 juluo 的 ri/h/ 与 ri/v/ 前缀下；max 为 0 时自动读取 /count.json
+// 随机图 API：使用现成的静态随机图服务（图片全在边缘节点，不占本站请求额度）
+// 接口形态：/ri/h/{n}.webp 横屏、/ri/v/{n}.webp 竖屏；max 为 0 时会尝试读 /count.json
+// 若该服务不可用，可换回自建方案：services/random-pic（git 历史里仍保留）
 export const randomImageConfig: RandomImageConfig = {
 	enable: true,
-	baseUrl: "https://p.juluo.work",
-	max: 0,
+	baseUrl: "https://pic.060730.xyz",
+	max: 979, // 实测 /ri/h/{n}.webp 的最大 n
+	maxVertical: 3596, // 实测 /ri/v/{n}.webp 的最大 n
 };
 
 // 链接卡片（::url{}）的元数据 API：自建 Worker 部署在 icon.juluo.work（代码见 services/link-card）
@@ -210,13 +211,6 @@ export const giscusConfig: GiscusConfig = {
 	mapping: "pathname",
 	lang: "zh-CN",
 	theme: `https://${customDomain}/css/giscus.css`,
-};
-
-// NAT 类型检测后端：原站后端是 Python + Docker（Twin-Server STUN，需要 UDP 端口），
-// Cloudflare Worker 无法承载；有 VPS 时把地址填进来并把 enable 打开
-export const natCheckConfig: NatCheckConfig = {
-	enable: false,
-	apiUrl: "",
 };
 
 // OneDrive / 对象存储文件索引（工具页的 OneDrive 标签页）：自建后填写

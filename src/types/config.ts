@@ -106,7 +106,10 @@ export type ViewCounterConfig = {
 export type RandomImageConfig = {
 	enable: boolean;
 	baseUrl: string;
+	/** 横屏图片数量（/ri/h/{n}.webp 的最大 n） */
 	max: number;
+	/** 竖屏图片数量（/ri/v/{n}.webp 的最大 n），仅画廊页用到 */
+	maxVertical: number;
 };
 
 export type LinkCardApiConfig = {
@@ -117,12 +120,6 @@ export type LinkCardApiConfig = {
 export type OneDriveConfig = {
 	enable: boolean;
 	apiBase: string;
-};
-
-export type NatCheckConfig = {
-	enable: boolean;
-	/** 后端地址，例如 https://nat.juluo.work/api/analyze（该服务需要 UDP，通常得跑在 VPS 上） */
-	apiUrl: string;
 };
 
 export type GiscusConfig = {
