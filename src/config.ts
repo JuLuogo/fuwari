@@ -149,12 +149,19 @@ export const imageFallbackConfig: ImageFallbackConfig = {
 // Umami 统计（Umami Cloud 美国区）
 // 后台：https://cloud.umami.is
 // 分享页：https://cloud.umami.is/analytics/us/share/JqAx99f9Wf6jWaGl
+// 官方追踪代码：
+//   <script defer src="https://cloud.umami.is/script.js" data-website-id="842d980c-5e11-4834-a2a8-5daaa285ce66"></script>
+// consentLevel 三种取值：
+//   "none"                → 直出上面的官方代码，不接 Cookie 同意（始终统计，默认，行为与官方一致）
+//   "strictly-necessary"  → 归入「严格必要」类，横幅加载后立即执行
+//   "tracking"            → 归入「跟踪」类，用户同意后才加载（以后加了 GA 之类的选这个）
 export const umamiConfig: UmamiConfig = {
 	enable: true,
 	baseUrl: "https://cloud.umami.is",
 	shareId: "JqAx99f9Wf6jWaGl",
 	websiteId: "842d980c-5e11-4834-a2a8-5daaa285ce66",
 	timezone: "Asia/Shanghai",
+	consentLevel: "none",
 };
 
 // 文章浏览量计数：需要自建计数服务（例如 Cloudflare Worker + D1）后把 enable 打开并填写地址

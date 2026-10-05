@@ -93,6 +93,8 @@ export type UmamiConfig = {
 	shareId: string;
 	websiteId: string;
 	timezone: string;
+	/** "none" 直出官方代码 / "strictly-necessary" 立即执行 / "tracking" 需用户同意后加载 */
+	consentLevel: "none" | "strictly-necessary" | "tracking";
 };
 
 export type ViewCounterConfig = {

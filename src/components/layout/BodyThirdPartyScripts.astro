@@ -153,13 +153,20 @@ import { cookieConsentConfig, umamiConfig } from "@/config";
 </script>
 
 <!-- Umami 统计（Umami Cloud，配置见 src/config.ts 的 umamiConfig）
-     data-cookie-consent="tracking"：用户拒绝跟踪时不会加载；若希望始终统计（Umami 无 Cookie），
-     可改成 "strictly-necessary" -->
-{umamiConfig.enable && (
+     consentLevel = "none" 时直出官方追踪代码；否则交给 Cookie 同意横幅按类别执行 -->
+{umamiConfig.enable && umamiConfig.consentLevel === "none" && (
+	<script
+		is:inline
+		defer
+		src={`${umamiConfig.baseUrl}/script.js`}
+		data-website-id={umamiConfig.websiteId}
+	></script>
+)}
+{umamiConfig.enable && umamiConfig.consentLevel !== "none" && (
 	<script
 		is:inline
 		type="text/plain"
-		data-cookie-consent="tracking"
+		data-cookie-consent={umamiConfig.consentLevel}
 		defer
 		src={`${umamiConfig.baseUrl}/script.js`}
 		data-website-id={umamiConfig.websiteId}
