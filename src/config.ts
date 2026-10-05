@@ -184,10 +184,10 @@ export const randomImageConfig: RandomImageConfig = {
 	max: 0,
 };
 
-// 链接卡片（::url{}）的元数据 API：自建后填写，留空则退化为普通链接卡片
+// 链接卡片（::url{}）的元数据 API：自建 Worker 部署在 icon.juluo.work（代码见 services/link-card）
 export const linkCardApiConfig: LinkCardApiConfig = {
-	enable: false,
-	baseUrl: "",
+	enable: true,
+	baseUrl: "https://icon.juluo.work",
 };
 
 // Cookie 同意（TermsFeed 免费版）：站点名与隐私政策地址会显示在横幅里

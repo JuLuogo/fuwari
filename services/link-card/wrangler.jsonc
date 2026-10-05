@@ -1,0 +1,17 @@
+{
+	"name": "link-card",
+	"main": "src/index.ts",
+	"compatibility_date": "2025-08-11",
+	"observability": {
+		"enabled": true
+	},
+	"vars": {
+		"ALLOWED_ORIGINS": "https://blog.juluo.work,https://juluo.work,http://localhost:4321"
+	},
+	"routes": [
+		{
+			"pattern": "icon.juluo.work",
+			"custom_domain": true
+		}
+	]
+}
