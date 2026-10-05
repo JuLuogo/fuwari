@@ -170,10 +170,10 @@ export const umamiConfig: UmamiConfig = {
 	consentLevel: "none",
 };
 
-// 文章浏览量计数：需要自建计数服务（例如 Cloudflare Worker + D1）后把 enable 打开并填写地址
+// 文章/页面浏览量：自建统计服务（Cloudflare Worker + D1，部署在 t.juluo.work）
 export const viewCounterConfig: ViewCounterConfig = {
-	enable: false,
-	endpoint: "",
+	enable: true,
+	endpoint: "https://t.juluo.work",
 };
 
 // 随机图 API：自建后把 enable 打开并填写地址（例如 https://p.juluo.work），
