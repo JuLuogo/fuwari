@@ -1,4 +1,4 @@
-﻿---
+---
 export const toolMeta = {
 	title: "文件",
 	description: "下载公开文件资源",
@@ -8,7 +8,7 @@ export const toolMeta = {
 
 import fs from "node:fs";
 import path from "node:path";
-import { siteConfig } from "@/config";
+import { oneDriveConfig, siteConfig } from "@/config";
 import FileExplorer from "@components/FileExplorer.svelte";
 import OneDriveExplorer from "@components/OneDriveExplorer.svelte";
 import ViewsCounter from "@components/ViewsCounter.astro";
@@ -117,6 +117,7 @@ const breadcrumbSchema = {
                 <Icon name="material-symbols:home-storage-rounded" class="text-lg" />
                 本站
             </button>
+            {oneDriveConfig.enable && (
             <button 
                 id="tab-onedrive"
                 class="tab-btn px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 whitespace-nowrap text-white/50 hover:bg-white/5"
@@ -124,15 +125,18 @@ const breadcrumbSchema = {
                 <Icon name="simple-icons:microsoftonedrive" class="text-lg" />
                 OneDrive
             </button>
+            )}
         </div>
 
         <div id="content-local" class="tab-content">
             <FileExplorer client:visible items={fileTree} />
         </div>
 
+        {oneDriveConfig.enable && (
         <div id="content-onedrive" class="tab-content hidden">
-            <OneDriveExplorer client:only="svelte" />
+            <OneDriveExplorer client:only="svelte" apiBase={oneDriveConfig.apiBase} />
         </div>
+        )}
 
         <script is:inline>
             function setupTabs() {

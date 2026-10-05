@@ -91,7 +91,47 @@ export type UmamiConfig = {
 	enable: boolean;
 	baseUrl: string;
 	shareId: string;
+	websiteId: string;
 	timezone: string;
+};
+
+export type ViewCounterConfig = {
+	enable: boolean;
+	endpoint: string;
+};
+
+export type RandomImageConfig = {
+	enable: boolean;
+	baseUrl: string;
+	max: number;
+};
+
+export type LinkCardApiConfig = {
+	enable: boolean;
+	baseUrl: string;
+};
+
+export type OneDriveConfig = {
+	enable: boolean;
+	apiBase: string;
+};
+
+export type GiscusConfig = {
+	enable: boolean;
+	repo: string;
+	repoId: string;
+	category: string;
+	categoryId: string;
+	mapping: string;
+	lang: string;
+	theme: string;
+};
+
+export type CookieConsentConfig = {
+	enable: boolean;
+	siteName: string;
+	privacyPolicyUrl: string;
+	language: string;
 };
 
 export type AiInvolvementLevel = 1 | 2 | 3;

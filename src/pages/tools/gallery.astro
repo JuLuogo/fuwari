@@ -8,6 +8,7 @@ export const toolMeta = {
 
 import PageCardHeader from "@components/misc/PageCardHeader.astro";
 import MainGridLayout from "@layouts/MainGridLayout.astro";
+import { randomImageConfig } from "@/config";
 ---
 
 <MainGridLayout title="画廊">
@@ -22,9 +23,11 @@ import MainGridLayout from "@layouts/MainGridLayout.astro";
 		</PageCardHeader>
 
 		<div class="text-sm text-50 mb-5 leading-relaxed">
-			图片二进制自托管于： <a href="https://p.2x.nz" target="_blank" rel="noopener noreferrer" class="font-medium text-75 hover:text-[var(--primary)] transition-colors">https://p.2x.nz</a> 
-            <br>
-            特别鸣谢：<b class="font-bold text-75">锦瑟/瑞希</b> 大佬提供的图源
+			{randomImageConfig.enable && randomImageConfig.baseUrl ? (
+				<>图片二进制自托管于： <a href={randomImageConfig.baseUrl} target="_blank" rel="noopener noreferrer" class="font-medium text-75 hover:text-[var(--primary)] transition-colors">{randomImageConfig.baseUrl}</a></>
+			) : (
+				<>尚未配置随机图 API（在 <code class="px-1 bg-black/20 rounded">src/config.ts</code> 的 <code class="px-1 bg-black/20 rounded">randomImageConfig</code> 中填写自建地址后即可显示画廊）</>
+			)}
 		</div>
 
 		<div id="gallery" class="gallery-grid" data-ready="false"></div>
@@ -56,8 +59,11 @@ import MainGridLayout from "@layouts/MainGridLayout.astro";
 		import { Fancybox } from "@fancyapps/ui";
 		import { fancyboxOptions as baseOptions } from "@utils/fancybox";
 
-		const COUNT_JSON_URL = "https://p.2x.nz/count.json";
-		const DOMAIN = "https://p.2x.nz";
+		const GALLERY_BASE = randomImageConfig.enable
+			? randomImageConfig.baseUrl.replace(/\/+$/, "")
+			: "";
+		const COUNT_JSON_URL = GALLERY_BASE ? `${GALLERY_BASE}/count.json` : "";
+		const DOMAIN = GALLERY_BASE;
 
 		let counts = { h: 0, v: 0 };
 		let currentType = "h";
@@ -121,6 +127,7 @@ import MainGridLayout from "@layouts/MainGridLayout.astro";
 
 		async function fetchCounts() {
 			try {
+				if (!COUNT_JSON_URL) throw new Error("random image api disabled");
 				const res = await fetch(COUNT_JSON_URL, { cache: "no-store" });
 				if (!res.ok) throw new Error(String(res.status));
 				const parsed = await res.json();
@@ -130,7 +137,7 @@ import MainGridLayout from "@layouts/MainGridLayout.astro";
 				counts = { h, v };
 				updateStatus();
 			} catch (e) {
-				counts = { h: 1074, v: 4003 };
+				counts = { h: 0, v: 0 };
 				updateStatus();
 			}
 		}

@@ -1,10 +1,10 @@
-﻿---
+---
 import path from "node:path";
 import type { CollectionEntry } from "astro:content";
 import { render } from "astro:content";
 import Icon from "@components/Icon.astro";
 
-import { umamiConfig } from "../config";
+import { randomImageConfig, umamiConfig } from "../config";
 import { formatPostDateForDisplay } from "../utils/date-utils";
 import { getDir } from "../utils/url-utils";
 import PostMetadata from "./PostMeta.astro";
@@ -121,14 +121,14 @@ const { remarkPluginFrontmatter } = await render(entry);
 <style define:vars={{coverWidth}}>
 </style>
 
-<script>
+<script define:vars={{ randomImage: randomImageConfig }}>
 	(function() {
+		if (!randomImage || !randomImage.enable || !randomImage.baseUrl || !randomImage.max) return;
 		const covers = document.querySelectorAll('.post-cover-random');
 		if (!covers.length) return;
-		const max = 1176;
 		for (const img of covers) {
-			const n = Math.floor(Math.random() * max) + 1;
-			img.src = `https://p.2x.nz/ri/h/${n}.webp`;
+			const n = Math.floor(Math.random() * randomImage.max) + 1;
+			img.src = `${randomImage.baseUrl}/ri/h/${n}.webp`;
 		}
 	})();
 

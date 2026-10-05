@@ -78,9 +78,6 @@ for (const post of posts) {
             -->
         </div>
 
-        <!-- 直播状态 -->
-        <div id="live-status-wrapper" style="display: none;">
-        </div>
     </div>
 </div>
 
@@ -88,45 +85,6 @@ for (const post of posts) {
     .loading-bar {
     }
     
-    #profile-avatar-wrapper.live-avatar-ring {
-        border-color: #ef4444 !important;
-        border-width: 3px;
-        overflow: visible !important;
-    }
-    
-    #profile-avatar-wrapper.live-avatar-ring::before {
-        content: '';
-        position: absolute;
-        inset: -3px;
-        border: 3px solid #ef4444;
-        pointer-events: none;
-    }
-    
-    :global(.live-link-wrapper) {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-decoration: none;
-        cursor: pointer;
-    }
-    
-    :global(.live-badge) {
-        text-align: center;
-        margin-top: 8px;
-        background: rgba(239, 68, 68, 0.95);
-        color: white;
-        padding: 4px 12px;
-        border-radius: 4px;
-        font-size: 0.875rem;
-        font-weight: bold;
-        display: inline-block;
-    }
-    
-    :global(#profile-avatar-container.has-live-badge) {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
 </style>
 
 <script is:inline>
@@ -150,83 +108,10 @@ for (const post of posts) {
         }
     }
 
-    // 检测直播状态
-    async function checkLiveStatus() {
-        const avatarWrapper = document.getElementById('profile-avatar-wrapper');
-        const avatarContainer = document.getElementById('profile-avatar-container');
-        if (!avatarWrapper || !avatarContainer) {
-            console.error('Avatar wrapper or container not found');
-            return;
-        }
-
-        const normalizeLiveDom = () => {
-            const liveLinks = avatarContainer.querySelectorAll(':scope > .live-link-wrapper');
-            if (liveLinks.length === 0) return null;
-
-            const primaryLink = liveLinks[0];
-            for (let i = 1; i < liveLinks.length; i += 1) {
-                const extraLink = liveLinks[i];
-                while (extraLink.firstChild) {
-                    primaryLink.appendChild(extraLink.firstChild);
-                }
-                extraLink.remove();
-            }
-
-            const badges = primaryLink.querySelectorAll(':scope > .live-badge');
-            for (let i = 1; i < badges.length; i += 1) {
-                badges[i].remove();
-            }
-            return primaryLink;
-        };
-
-        try {
-            const response = await fetch('https://b-live.2x.nz');
-            if (!response.ok) {
-                console.error('Live status request failed:', response.status);
-                return;
-            }
-
-            const status = await response.text();
-            const isLive = status.trim() === '1';
-
-            if (!isLive) return;
-
-            // 先清理潜在重复节点，保证逻辑幂等
-            let liveLink = normalizeLiveDom();
-
-            avatarWrapper.classList.add('live-avatar-ring');
-            avatarContainer.classList.add('has-live-badge');
-
-            if (!liveLink) {
-                liveLink = document.createElement('a');
-                liveLink.href = 'https://live.bilibili.com/12005649';
-                liveLink.target = '_blank';
-                liveLink.rel = 'noopener noreferrer';
-                liveLink.className = 'live-link-wrapper';
-
-                while (avatarContainer.firstChild) {
-                    liveLink.appendChild(avatarContainer.firstChild);
-                }
-                avatarContainer.appendChild(liveLink);
-            }
-
-            if (!liveLink.querySelector(':scope > .live-badge')) {
-                const liveBadge = document.createElement('div');
-                liveBadge.className = 'live-badge';
-                liveBadge.textContent = '直播中';
-                liveLink.appendChild(liveBadge);
-            }
-        } catch (error) {
-            // 请求失败，保持默认状态
-            console.error('Failed to check live status:', error);
-        }
-    }
-
 
     function initProfile() {
         console.log('Profile script loaded');
         loadSiteStats();
-        checkLiveStatus();
     }
 
     // 初次加载

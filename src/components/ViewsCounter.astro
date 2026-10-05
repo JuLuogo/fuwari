@@ -1,5 +1,6 @@
-﻿---
+---
 import Icon from "@components/Icon.astro";
+import { viewCounterConfig } from "../config";
 
 type Props = {
 	pathname: string;
@@ -10,8 +11,12 @@ type Props = {
 const { pathname, suffix = "次" } = Astro.props;
 const id =
 	Astro.props.id ?? `page-views-${pathname.replace(/[^a-zA-Z0-9]+/g, "-")}`;
+const enabled =
+	viewCounterConfig.enable && viewCounterConfig.endpoint.trim() !== "";
+const endpoint = viewCounterConfig.endpoint.replace(/\/+$/, "");
 ---
 
+{enabled && (
 <div class="flex items-center" id={`${id}-wrapper`} style="display: none;">
 	<div class="meta-icon">
 		<Icon name="material-symbols:visibility-outline-rounded" class="text-xl" />
@@ -19,21 +24,21 @@ const id =
 	<span class="text-50 text-sm font-medium" id={id}></span>
 </div>
 
-<script define:vars={{ pathname, id, suffix }}>
+<script define:vars={{ pathname, id, suffix, endpoint }}>
 	async function loadViews() {
 		const wrapper = document.getElementById(`${id}-wrapper`);
 		const el = document.getElementById(id);
 		if (!el || !wrapper) return;
-		
+
 		try {
 			const res = await fetch(
-				`https://t.2x.nz/share?pathname=${encodeURIComponent(pathname)}`,
+				`${endpoint}/share?pathname=${encodeURIComponent(pathname)}`,
 			);
 			if (!res.ok) return;
-			
+
 			const data = await res.json();
 			const views = data?.views || 0;
-			
+
 			el.textContent = `${views} ${suffix}`;
 			wrapper.style.display = 'flex';
 		} catch {
@@ -45,3 +50,4 @@ const id =
 		document.addEventListener("DOMContentLoaded", loadViews);
 	else loadViews();
 </script>
+)}

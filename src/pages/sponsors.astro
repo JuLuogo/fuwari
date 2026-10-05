@@ -138,6 +138,11 @@ const breadcrumbSchema = {
                 <LinkSubmitInfo dataType="sponsors"></LinkSubmitInfo>
             </div>
             <div class="space-y-0">
+                {sponsors.length === 0 && (
+                    <div class="p-6 text-sm text-white/50 border border-dashed border-white/10">
+                        还没有赞助记录，把数据加到 <code class="px-1 bg-black/20 rounded">src/data/sponsors/</code> 目录下即可显示。
+                    </div>
+                )}
                 {sponsors.map((sponsor) => (
                     <div class="p-4 hover:bg-white/5 transition border-b border-white/10 last:border-b-0">
                         <div class="flex items-center gap-3">

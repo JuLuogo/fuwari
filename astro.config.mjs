@@ -10,7 +10,7 @@ import remarkDirective from "remark-directive"; /* Handle directives */
 import remarkMath from "remark-math";
 import remarkSectionize from "remark-sectionize";
 import { SKIP, visit } from "unist-util-visit";
-import { imageFallbackConfig, siteConfig } from "./src/config.ts";
+import { imageFallbackConfig, linkCardApiConfig, siteConfig } from "./src/config.ts";
 import { rehypeAIAdmonition } from "./src/plugins/rehype-ai-admonition.mjs";
 import { AdmonitionComponent } from "./src/plugins/rehype-component-admonition.mjs";
 import { GithubCardComponent } from "./src/plugins/rehype-component-github-card.mjs";
@@ -95,89 +95,8 @@ export default defineConfig({
 	},
 	base: "/",
 	output: "static",
-	redirects: {
-		"/privacy-policy": {
-			status: 302,
-			destination: `https://${siteConfig.customDomain}/posts/privacy-policy/`,
-		},
-		"/long": {
-			status: 302,
-			destination:
-				"https://iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii.iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii.in/",
-		},
-		"/tit": {
-			status: 302,
-			destination: "/posts/pin/",
-		},
-		"/q": {
-			status: 302,
-			destination: "/posts/pin/",
-		},
-		"/t": {
-			status: 302,
-			destination: `https://i.${siteConfig.customDomain}`,
-		},
-		"/ak": {
-			status: 302,
-			destination:
-				"https://akile.io/register?aff_code=503fe5ea-e7c5-4d68-ae05-6de99513680e",
-		},
-		"/yyb": {
-			status: 302,
-			destination: "https://www.rainyun.com/acofork_?s=bilibili",
-		},
-		"/wly": {
-			status: 302,
-			destination: "https://w1.wlylogin.com:8888/#/register?code=FNQwOQBM",
-		},
-		"/mly": {
-			status: 302,
-			destination: "https://muleyun.com/aff/GOTRJLPN",
-		},
-		"/tly": {
-			status: 302,
-			destination: "https://tianlicloud.cn/aff/HNNCFKGP",
-		},
-		"/kook": {
-			status: 302,
-			destination: "https://kook.vip/K29zpT",
-		},
-		"/gal": {
-			status: 302,
-			destination: "/post/gal/",
-		},
-		"/ok": {
-			status: 302,
-			destination: "https://acofork-uptime.zeabur.app/status/acofork",
-		},
-		"/donate": {
-			status: 302,
-			destination: "/sponsors",
-		},
-		"/tg": {
-			status: 302,
-			destination: "https://t.me/+_07DERp7k1ljYTc1",
-		},
-		"/esa": {
-			status: 302,
-			destination:
-				"https://tianchi.aliyun.com/specials/promotion/freetier/esa?taskCode=25254&recordId=c856e61228828a0423417a767828d166",
-		},
-		"/plan": {
-			status: 302,
-			destination:
-				"https://acofork.notion.site/2e11e011d4e5800fa050e8f7cf448347",
-		},
-		"/iku": {
-			status: 302,
-			destination: "https://ikuuu.de/",
-		},
-		"/hnr": {
-			status: 302,
-			destination:
-				"https://subspace.shop/products/lin-pianpian-keychain-the-weeping-swan-ten-days-of-the-citys-fall?_pos=1&_sid=5ba9d94dd&_ss=r",
-		},
-	},
+	// 需要短链/跳转时在这里添加，例如：
+	// redirects: { "/donate": { status: 302, destination: "/sponsors/" } },
 	integrations: [
 		tailwind({
 			nesting: true,
@@ -211,7 +130,12 @@ export default defineConfig({
 				{
 					components: {
 						github: GithubCardComponent,
-						url: UrlCardComponent,
+						url: (x, y) =>
+							UrlCardComponent(x, y, {
+								apiBase: linkCardApiConfig.enable
+									? linkCardApiConfig.baseUrl
+									: "",
+							}),
 						note: (x, y) => AdmonitionComponent(x, y, "note"),
 						tip: (x, y) => AdmonitionComponent(x, y, "tip"),
 						important: (x, y) => AdmonitionComponent(x, y, "important"),

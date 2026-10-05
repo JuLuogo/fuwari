@@ -1,7 +1,7 @@
-﻿<script lang="ts">
+<script lang="ts">
 import Icon from "@components/IconSvelte.svelte";
 
-export let apiBase = "https://e3.2x.nz/api/";
+export let apiBase = "";
 
 interface FileItem {
 	id: string;

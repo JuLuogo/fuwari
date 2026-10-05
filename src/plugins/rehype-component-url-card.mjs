@@ -7,9 +7,10 @@ import { h } from "hastscript";
  * @param {Object} properties - The properties of the component.
  * @param {string} properties.href - The URL to display.
  * @param {import('mdast').RootContent[]} children - The children elements of the component.
+ * @param {{ apiBase?: string }} [options] - 元数据 API 地址；为空时退化为静态链接卡片（不发起请求）。
  * @returns {import('mdast').Parent} The created URL Card component.
  */
-export function UrlCardComponent(properties, children) {
+export function UrlCardComponent(properties, children, options = {}) {
 	if (Array.isArray(children) && children.length !== 0)
 		return h("div", { class: "hidden" }, [
 			'Invalid directive. ("url" directive must be leaf type "::url{href="https://example.com"}")',
@@ -23,9 +24,10 @@ export function UrlCardComponent(properties, children) {
 		);
 
 	const url = properties.href;
+	const apiBase = (options.apiBase || "").replace(/\/+$/, "");
 	const cardUuid = `UC${Math.random().toString(36).slice(-6)}`; // Collisions are not important
 
-	const nImage = h(`div#${cardUuid}-image`, { class: "uc-image" });
+	const nImage = apiBase ? h(`div#${cardUuid}-image`, { class: "uc-image" }) : null;
 
 	const nTitle = h("div", { class: "uc-titlebar" }, [
 		h("div", { class: "uc-titlebar-left" }, [
@@ -37,20 +39,22 @@ export function UrlCardComponent(properties, children) {
 	const nDescription = h(
 		`div#${cardUuid}-description`,
 		{ class: "uc-description" },
-		"Waiting for metadata...",
+		apiBase ? "Waiting for metadata..." : "点击访问该链接",
 	);
 
 	const nTitleText = h(
 		`div#${cardUuid}-title`,
 		{ class: "uc-title-text" },
-		"Loading...",
+		apiBase ? "Loading..." : url,
 	);
 
-	const nScript = h(
-		`script#${cardUuid}-script`,
-		{ type: "text/javascript", defer: true },
-		`
-      fetch('https://icon.2x.nz/?url=${url}').then(response => response.json()).then(meta => {
+	const nScript = !apiBase
+		? null
+		: h(
+				`script#${cardUuid}-script`,
+				{ type: "text/javascript", defer: true },
+				`
+      fetch('${apiBase}/?url=${url}').then(response => response.json()).then(meta => {
         if (meta && meta.url) {
             document.getElementById('${cardUuid}-title').innerText = meta.title || "${url}";
             document.getElementById('${cardUuid}-description').innerText = meta.description || "No description available";
@@ -87,17 +91,21 @@ export function UrlCardComponent(properties, children) {
 	return h(
 		`a#${cardUuid}-card`,
 		{
-			class: "card-url fetch-waiting no-styling",
+			class: `card-url no-styling${apiBase ? " fetch-waiting" : ""}`,
 			href: url,
 			target: "_blank",
 			url,
 		},
 		[
-			h(`div#${cardUuid}-container`, { class: "uc-container" }, [
-				h("div", { class: "uc-content" }, [nTitle, nTitleText, nDescription]),
-				nImage,
-			]),
+			h(
+				`div#${cardUuid}-container`,
+				{ class: `uc-container${apiBase ? "" : " no-image"}` },
+				[
+					h("div", { class: "uc-content" }, [nTitle, nTitleText, nDescription]),
+					nImage,
+				],
+			),
 			nScript,
-		],
+		].filter(Boolean),
 	);
 }

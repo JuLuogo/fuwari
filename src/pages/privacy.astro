@@ -1,0 +1,99 @@
+---
+import MainGridLayout from "@layouts/MainGridLayout.astro";
+import Icon from "@components/Icon.astro";
+import { cookieConsentConfig, profileConfig, siteConfig } from "@/config";
+
+const contactEmail =
+	profileConfig.links.find((link) => link.url.startsWith("mailto:"))?.url.replace("mailto:", "") ?? "";
+const qqLink = profileConfig.links.find((link) => link.name === "QQ")?.url ?? "";
+
+const breadcrumbSchema = {
+	"@context": "https://schema.org",
+	"@type": "BreadcrumbList",
+	itemListElement: [
+		{
+			"@type": "ListItem",
+			position: 1,
+			name: "首页",
+			item: Astro.site,
+		},
+		{
+			"@type": "ListItem",
+			position: 2,
+			name: "隐私政策",
+			item: new URL("/privacy/", Astro.site).toString(),
+		},
+	],
+};
+---
+
+<MainGridLayout title="隐私政策">
+	<script is:inline slot="head" type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)}></script>
+	<div class="p-6 md:p-8 border-b border-white/10">
+		<div class="flex items-center gap-2 mb-6">
+			<div class="h-8 w-8 rounded-lg bg-[var(--primary)] flex items-center justify-center text-black/70">
+				<Icon name="material-symbols:privacy-tip-outline-rounded" class="text-[1.5rem]" />
+			</div>
+			<h1 class="text-2xl font-bold text-white">隐私政策</h1>
+		</div>
+
+		<div class="prose prose-invert max-w-none text-sm leading-relaxed text-75">
+			<p>
+				本页说明 {siteConfig.title}（{siteConfig.customDomain}）会收集哪些信息、如何使用，以及你可以如何控制这些信息。
+			</p>
+
+			<h2>一、我们收集什么</h2>
+			<ul>
+				<li><strong>访问统计</strong>：本站使用 <a href="https://umami.is" target="_blank" rel="noopener noreferrer">Umami</a> 进行匿名访问统计，不写入 Cookie、不做跨站追踪，仅记录页面路径、来源、浏览器与地区等聚合信息，无法用于识别个人身份。</li>
+				<li><strong>评论</strong>：文章评论由 <a href="https://giscus.app" target="_blank" rel="noopener noreferrer">Giscus</a> 提供，内容存储在 GitHub Discussions。使用评论需要登录 GitHub，你的头像与用户名会随评论展示，相关数据受 <a href="https://docs.github.com/site-policy/privacy-policies/github-privacy-statement" target="_blank" rel="noopener noreferrer">GitHub 隐私声明</a>约束。</li>
+				<li><strong>服务器日志</strong>：本站部署在 Cloudflare 上，访问时会产生常规访问日志（IP、时间、请求路径等），用于安全防护与故障排查。</li>
+				<li><strong>头像与图片</strong>：个人头像等静态资源可能由第三方图床（如 QQ 头像服务）提供，加载时会向对应服务发起请求。</li>
+			</ul>
+
+			<h2>二、Cookie 与同意</h2>
+			<p>
+				本站使用 Cookie 同意横幅管理非必要脚本：
+			</p>
+			<ul>
+				<li><strong>严格必要（strictly-necessary）</strong>：维持站点正常运行，默认加载，无法关闭。</li>
+				<li><strong>跟踪（tracking）</strong>：访问统计脚本，只有在你同意后才会加载。</li>
+				<li><strong>定向（targeting）</strong>：本站目前不使用广告类脚本。</li>
+			</ul>
+			<p>
+				你可以随时点击页脚的
+				<a href="#" id="open_preferences_center">更新您的Cookie</a>
+				重新选择，或直接在浏览器中清除本站 Cookie。
+			</p>
+
+			<h2>三、我们不会做的事</h2>
+			<ul>
+				<li>不出售、不出租、不交换你的个人信息。</li>
+				<li>不使用广告联盟脚本进行跨站追踪。</li>
+				<li>不要求你提供与浏览本站无关的个人信息。</li>
+			</ul>
+
+			<h2>四、你的权利</h2>
+			<p>
+				你可以随时拒绝或撤回统计类同意；评论内容可在 GitHub Discussions 中自行编辑或删除；
+				如需查询或删除与你相关的信息，可通过下面的方式联系我。
+			</p>
+
+			<h2>五、联系方式</h2>
+			<ul>
+				<li>QQ：<a href={qqLink} target="_blank" rel="noopener noreferrer">1576586736</a></li>
+				{contactEmail && (
+					<li>Email：<a href={`mailto:${contactEmail}`}>{contactEmail}</a></li>
+				)}
+			</ul>
+
+			<h2>六、政策更新</h2>
+			<p>
+				本政策可能随站点功能变化而更新，更新后会在本页展示最新版本。
+				最后更新：{new Date().toISOString().slice(0, 10)}。
+			</p>
+			<p class="text-xs text-50">
+				提示：这是一份按本站当前功能编写的模板，如需正式对外发布，请按你的实际情况补充或咨询专业人士。
+			</p>
+		</div>
+	</div>
+</MainGridLayout>

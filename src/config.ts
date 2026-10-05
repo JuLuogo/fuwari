@@ -1,36 +1,44 @@
 import type {
+	CookieConsentConfig,
 	GitHubEditConfig,
+	GiscusConfig,
 	ImageFallbackConfig,
 	LicenseConfig,
+	LinkCardApiConfig,
 	NavBarConfig,
+	OneDriveConfig,
 	ProfileConfig,
+	RandomImageConfig,
 	SiteConfig,
 	UmamiConfig,
+	ViewCounterConfig,
 } from "./types/config";
 import { LinkPreset } from "./types/config";
 
-const customDomain = "2x.nz";
+const customDomain = "juluo.work";
+
+// 个人 QQ（头像与联系入口都由它推导，换号只需改这一处）
+const qqNumber = "1576586736";
+const qqAvatar = `https://q2.qlogo.cn/headimg_dl?dst_uin=${qqNumber}&spec=0`;
+
+// TODO: 换成你自己的邮箱地址（当前为占位符）
+const contactEmail = `juluo@${customDomain}`;
 
 export const siteConfig: SiteConfig = {
 	customDomain,
-	title: "《二叉树树》官方网站",
-	subtitle: "AcoFork",
+	title: "peroe 的博客",
+	subtitle: "juluo",
 	description:
-		"《二叉树树》是一个专注于IT/互联网技术分享与实践的个人技术博客，在这里你可以找到众多前沿技术的分享与实践经验。",
+		"peroe 的个人博客，记录技术折腾、开发笔记与生活碎片，欢迎来玩。",
 
 	keywords: [
-		"二叉树树",
-		"二叉树树官网",
-		"树",
-		"二叉树",
-		"二叉",
-		"博客",
-		"AcoFork Blog",
-		"AcoFork",
+		"peroe",
+		"peroe 的博客",
+		"juluo",
+		"juluo.work",
+		"个人博客",
+		"技术博客",
 		"Blog",
-		"acofork blog",
-		"acofork",
-		"blog",
 	],
 	lang: "zh_CN", // 'en', 'zh_CN', 'zh_TW', 'ja', 'ko', 'es', 'th'
 	themeColor: {
@@ -39,14 +47,14 @@ export const siteConfig: SiteConfig = {
 	},
 	banner: {
 		enable: false,
-		src: "/xinghui.avif", // Relative to the /src directory. Relative to the /public directory if it starts with '/'
+		src: "", // 放自己的图后填 '/xxx.avif'（public 目录）或完整 URL
 
 		position: "center", // Equivalent to object-position, only supports 'top', 'center', 'bottom'. 'center' by default
 		credit: {
-			enable: true, // Display the credit text of the banner image
-			text: "Pixiv @chokei", // Credit text to be displayed
+			enable: false, // Display the credit text of the banner image
+			text: "", // Credit text to be displayed
 
-			url: "https://www.pixiv.net/artworks/122782209", // (Optional) URL link to the original artwork or artist's page
+			url: "", // (Optional) URL link to the original artwork or artist's page
 		},
 	},
 	background: {
@@ -65,19 +73,11 @@ export const siteConfig: SiteConfig = {
 	favicon: [
 		// Leave this array empty to use the default favicon
 		{
-			src: "https://q2.qlogo.cn/headimg_dl?dst_uin=2726730791&spec=0", // Path of the favicon, relative to the /public directory
+			src: qqAvatar, // Path of the favicon, relative to the /public directory
 			//   sizes: '32x32',              // (Optional) Size of the favicon, set only if you have favicons of different sizes
 		},
 	],
-	officialSites: [
-		{ url: "https://acofork.com", alias: "CN" },
-		{ url: `https://${customDomain}`, alias: "Global" },
-	],
-	server: [
-		{ url: "", text: "Blog" },
-		{ url: `https://u.${customDomain}`, text: "Umami" },
-		{ url: `https://p.${customDomain}`, text: "RandomPic" },
-	],
+	server: [],
 };
 
 export const navBarConfig: NavBarConfig = {
@@ -104,48 +104,32 @@ export const navBarConfig: NavBarConfig = {
 		},
 		{
 			name: "统计",
-			url: `https://u.${customDomain}/share/CdkXbGgZr6ECKOyK`,
+			url: `https://cloud.umami.is/analytics/us/share/${"JqAx99f9Wf6jWaGl"}`,
 			external: true,
 			icon: "material-symbols:table-chart",
-		},
-		{
-			name: "论坛",
-			url: "/forum/",
-			external: false,
-			icon: "material-symbols:forum-outline-rounded",
 		},
 	],
 };
 
 export const profileConfig: ProfileConfig = {
-	avatar: "https://q2.qlogo.cn/headimg_dl?dst_uin=2726730791&spec=0", // Relative to the /src directory. Relative to the /public directory if it starts with '/'
-	name: "二叉树树",
-	bio: "Protect What You Love.",
+	avatar: qqAvatar, // Relative to the /src directory. Relative to the /public directory if it starts with '/'
+	name: "peroe",
+	bio: "记录折腾与生活。",
 	links: [
 		{
 			name: "QQ",
 			icon: "simple-icons:qq",
-			url: "https://qm.qq.com/q/FWqOHlwL2m",
-		},
-		{
-			name: "Telegram",
-			icon: "simple-icons:telegram",
-			url: "https://t.me/+_07DERp7k1ljYTc1",
-		},
-		{
-			name: "Bilibli",
-			icon: "simple-icons:bilibili",
-			url: "https://space.bilibili.com/325903362",
+			url: `https://wpa.qq.com/msgrd?v=3&uin=${qqNumber}&site=qq&menu=yes`,
 		},
 		{
 			name: "GitHub",
 			icon: "simple-icons:github",
-			url: "https://github.com/afoim",
+			url: "https://github.com/juluogo",
 		},
 		{
-			name: "Folo",
-			icon: "simple-icons:folo",
-			url: "https://app.folo.is/share/feeds/245004133358075904",
+			name: "Email",
+			icon: "material-symbols:mail-outline-rounded",
+			url: `mailto:${contactEmail}`,
 		},
 	],
 };
@@ -158,20 +142,71 @@ export const licenseConfig: LicenseConfig = {
 
 export const imageFallbackConfig: ImageFallbackConfig = {
 	enable: false,
-	originalDomain: "https://eopfapi.acofork.com/pic?img=ua",
-	fallbackDomain: "https://eopfapi.acofork.com/pic?img=ua",
+	originalDomain: `https://p.${customDomain}`,
+	fallbackDomain: `https://p.${customDomain}`,
 };
 
+// Umami 统计（Umami Cloud 美国区）
+// 后台：https://cloud.umami.is
+// 分享页：https://cloud.umami.is/analytics/us/share/JqAx99f9Wf6jWaGl
 export const umamiConfig: UmamiConfig = {
 	enable: true,
-	baseUrl: `https://u.${customDomain}`,
-	shareId: "CdkXbGgZr6ECKOyK",
+	baseUrl: "https://cloud.umami.is",
+	shareId: "JqAx99f9Wf6jWaGl",
+	websiteId: "842d980c-5e11-4834-a2a8-5daaa285ce66",
 	timezone: "Asia/Shanghai",
+};
+
+// 文章浏览量计数：需要自建计数服务（例如 Cloudflare Worker + D1）后把 enable 打开并填写地址
+export const viewCounterConfig: ViewCounterConfig = {
+	enable: false,
+	endpoint: "",
+};
+
+// 随机图 API：自建后把 enable 打开并填写地址（例如 https://p.juluo.work），
+// 图片需按 /ri/h/{n}.webp 存放，/count.json 返回 { "h": 总数 }
+export const randomImageConfig: RandomImageConfig = {
+	enable: false,
+	baseUrl: "",
+	max: 0,
+};
+
+// 链接卡片（::url{}）的元数据 API：自建后填写，留空则退化为普通链接卡片
+export const linkCardApiConfig: LinkCardApiConfig = {
+	enable: false,
+	baseUrl: "",
+};
+
+// Cookie 同意（TermsFeed 免费版）：站点名与隐私政策地址会显示在横幅里
+export const cookieConsentConfig: CookieConsentConfig = {
+	enable: true,
+	siteName: "peroe 的博客",
+	privacyPolicyUrl: `https://${customDomain}/privacy/`,
+	// 语言代码见 TermsFeed i18n，改动前先在浏览器里确认横幅文案正常
+	language: "zh-TW",
+};
+
+// Giscus 评论：仓库需开启 Discussions，并在仓库上安装 GitHub App https://github.com/apps/giscus
+export const giscusConfig: GiscusConfig = {
+	enable: true,
+	repo: "juluogo/giscus",
+	repoId: "R_kgDOPdSugg",
+	category: "Announcements",
+	categoryId: "DIC_kwDOPdSugs4CuINO",
+	mapping: "pathname",
+	lang: "zh-CN",
+	theme: `https://${customDomain}/css/giscus.css`,
+};
+
+// OneDrive / 对象存储文件索引（工具页的 OneDrive 标签页）：自建后填写
+export const oneDriveConfig: OneDriveConfig = {
+	enable: false,
+	apiBase: `https://e3.${customDomain}/api/`,
 };
 
 export const gitHubEditConfig: GitHubEditConfig = {
 	enable: true,
-	baseUrl: "https://github.com/afoim/fuwari/blob/main/src/content/posts",
+	baseUrl: "https://github.com/juluogo/fuwari/blob/main/src/content/posts",
 };
 
 // todoConfig removed from here

@@ -10,7 +10,7 @@ interface Props {
 	loading?: "eager" | "lazy";
 	objectFit?: "cover" | "contain";
 }
-import { siteConfig } from "../../config";
+import { randomImageConfig, siteConfig } from "../../config";
 import { url } from "../../utils/url-utils";
 
 const {
@@ -33,7 +33,10 @@ const isLocal = !isExternal && !isPublic && !isRandom;
 // 计算最终路径
 let finalSrc = src;
 if (isRandom) {
-	finalSrc = "https://p.2x.nz/ri/h/1.webp";
+	// 未自建随机图 API 时不请求外部服务，留空由上层回退
+	finalSrc = randomImageConfig.enable
+		? `${randomImageConfig.baseUrl}/ri/h/1.webp`
+		: "";
 } else if (isLocal) {
 	// 本地相对路径：'/public/assets/images/xxx.webp'
 	// 转换为绝对路径：'/public/assets/images/xxx.webp'
@@ -51,7 +54,7 @@ const fetchPriority = loading === "eager" ? "high" : "low";
 	<img 
 		src={finalSrc} 
 		alt={alt || ""} 
-		class={`${imageClass} image-content ${isRandom ? 'post-cover-random' : ''}`} 
+		class={`${imageClass} image-content ${isRandom && randomImageConfig.enable ? 'post-cover-random' : ''}`} 
 		style={imageStyle} 
 		loading={loading} 
 		fetchpriority={fetchPriority} 

@@ -10,9 +10,11 @@ import {
 	resolveCurrentWeek,
 } from "@utils/timetable-normalizer";
 import { parseTimetableFile } from "@utils/timetable-parser-server";
+import { resolveTimetableFile } from "@utils/timetable-data";
 
-const filePath = "src/data/timetable/大一下2.json";
-const absoluteFilePath = path.join(process.cwd(), filePath);
+// 课表数据目录：把导出的 JSON 放进 src/data/timetable/ 即可，自动取第一个文件
+const filePath = resolveTimetableFile();
+const absoluteFilePath = filePath ? path.join(process.cwd(), filePath) : "";
 
 let viewModel: TimetableViewModel | null = null;
 let loadError = "";
@@ -20,6 +22,7 @@ let isCurrentWeek = false;
 let baselineText = "";
 
 try {
+	if (!filePath) throw new Error("尚未配置课表数据");
 	baselineText = fs.readFileSync(absoluteFilePath, "utf-8");
 	const parsedData = parseTimetableFile(filePath);
 	const currentWeek = resolveCurrentWeek(
@@ -64,7 +67,7 @@ const breadcrumbSchema = {
 		<div class="p-6 md:p-8 border-b border-white/10">
 			<PageCardHeader title="课程表" icon="material-symbols:calendar-month" pathname="/timetable/" />
 			<div class="rounded-lg border border-red-400/30 bg-red-500/10 p-4 text-sm text-red-200">
-				课表加载失败：{loadError || "未知错误"}
+				{loadError || "课表数据加载失败，请把课表 JSON 放到 src/data/timetable/ 目录下"}
 			</div>
 		</div>
 	)}

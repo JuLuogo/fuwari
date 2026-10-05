@@ -15,7 +15,7 @@ import { render } from "astro:content";
 import { gitHubEditConfig, licenseConfig } from "src/config";
 import PostMetadata from "../../components/PostMeta.astro";
 import ImageWrapper from "../../components/misc/ImageWrapper.astro";
-import { profileConfig, siteConfig, umamiConfig } from "../../config";
+import { giscusConfig, profileConfig, randomImageConfig, siteConfig, umamiConfig } from "../../config";
 import {
 	formatDateToYYYYMMDD,
 	formatPostDateForDisplay,
@@ -248,40 +248,42 @@ const jsonLd = [
 
             {licenseConfig.enable && <License title={entry.data.title} slug={entry.id} pubDate={entry.data.published} class="mb-6 rounded-xl license-container"></License>}
             
-            <!-- Giscus 评论区 -->
+            <!-- Giscus 评论区（配置见 src/config.ts 的 giscusConfig） -->
+            {giscusConfig.enable && (
             <div id="giscus-container" class="giscus"></div>
-            <script is:inline>
+            <script is:inline define:vars={{ giscus: giscusConfig }}>
                 function loadGiscus() {
                     const container = document.getElementById('giscus-container');
                     if (!container) return;
-                    
+
                     // 清除旧的 Giscus
                     container.innerHTML = '';
-                    
+
                     // 创建新的 script 标签
                     const script = document.createElement('script');
                     script.src = 'https://giscus.app/client.js';
-                    script.setAttribute('data-repo', 'afoim/giscus-fuwari');
-                    script.setAttribute('data-repo-id', 'R_kgDOOi8quw');
-                    script.setAttribute('data-category', 'Announcements');
-                    script.setAttribute('data-category-id', 'DIC_kwDOOi8qu84CprDV');
-                    script.setAttribute('data-mapping', 'pathname');
+                    script.setAttribute('data-repo', giscus.repo);
+                    script.setAttribute('data-repo-id', giscus.repoId);
+                    script.setAttribute('data-category', giscus.category);
+                    script.setAttribute('data-category-id', giscus.categoryId);
+                    script.setAttribute('data-mapping', giscus.mapping);
                     script.setAttribute('data-strict', '1');
                     script.setAttribute('data-reactions-enabled', '1');
                     script.setAttribute('data-emit-metadata', '0');
                     script.setAttribute('data-input-position', 'top');
-                    script.setAttribute('data-theme', 'https://2x.nz/css/giscus.css');
-                    script.setAttribute('data-lang', 'zh-CN');
+                    script.setAttribute('data-theme', giscus.theme);
+                    script.setAttribute('data-lang', giscus.lang);
                     script.setAttribute('data-loading', 'lazy');
                     script.setAttribute('crossorigin', 'anonymous');
                     script.async = true;
-                    
+
                     container.appendChild(script);
                 }
-                
+
                 // 页面加载时加载 Giscus
                 loadGiscus();
             </script>
+            )}
     <br>
 
     <div class="flex flex-col md:flex-row justify-between mb-4 gap-4 overflow-hidden w-full">
@@ -314,7 +316,7 @@ const jsonLd = [
     }
 </style>
 
-<script define:vars={{ siteConfig }}>
+<script define:vars={{ siteConfig, randomImage: randomImageConfig }}>
     // 图片加载处理 (仅用于图片回退逻辑)
     function setupImageLoading() {
         // 保留此函数用于将来的其他处理，或者彻底删除
@@ -324,14 +326,15 @@ const jsonLd = [
         setupImageLoading();
     }
 
-    // 随机封面图替换
+    // 随机封面图替换（需在 src/config.ts 配置 randomImageConfig）
     function setupRandomCovers() {
+        if (!randomImage || !randomImage.enable || !randomImage.baseUrl || !randomImage.max) return;
         const covers = document.querySelectorAll('.post-cover-random');
         if (!covers.length) return;
-        const max = 1176;
+        const base = String(randomImage.baseUrl).replace(/\/+$/, "");
         for (const img of covers) {
-            const n = Math.floor(Math.random() * max) + 1;
-            img.src = `https://p.2x.nz/ri/h/${n}.webp`;
+            const n = Math.floor(Math.random() * randomImage.max) + 1;
+            img.src = `${base}/ri/h/${n}.webp`;
         }
     }
 

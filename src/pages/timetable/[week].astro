@@ -10,9 +10,10 @@ import {
 	resolveCurrentWeek,
 } from "@utils/timetable-normalizer";
 import { parseTimetableFile } from "@utils/timetable-parser-server";
+import { resolveTimetableFile } from "@utils/timetable-data";
 
-const filePath = "src/data/timetable/大一下2.json";
-const absoluteFilePath = path.join(process.cwd(), filePath);
+const filePath = resolveTimetableFile();
+const absoluteFilePath = filePath ? path.join(process.cwd(), filePath) : "";
 
 let viewModel: TimetableViewModel | null = null;
 let loadError = "";
@@ -22,6 +23,7 @@ let baselineText = "";
 const weekParam = Number(Astro.params.week);
 
 try {
+	if (!filePath) throw new Error("尚未配置课表数据");
 	baselineText = fs.readFileSync(absoluteFilePath, "utf-8");
 	const parsedData = parseTimetableFile(filePath);
 	const currentWeek = resolveCurrentWeek(
@@ -58,7 +60,12 @@ const breadcrumbSchema = {
 };
 
 export function getStaticPaths() {
-	const parsedData = parseTimetableFile("src/data/timetable/大一下2.json");
+	const filePath = resolveTimetableFile();
+	if (!filePath) {
+		// 未配置课表时不生成周次页面，直接给一个占位页展示提示
+		return [{ params: { week: "1" } }];
+	}
+	const parsedData = parseTimetableFile(filePath);
 	const maxWeek = Math.max(1, parsedData.meta.maxWeek || 1);
 	return Array.from({ length: maxWeek }, (_, index) => ({
 		params: {

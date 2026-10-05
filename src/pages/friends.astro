@@ -47,6 +47,11 @@ const breadcrumbSchema = {
                 <LinkSubmitInfo dataType="friends"></LinkSubmitInfo>
             </div>
         <div class="space-y-0">
+            {friends.length === 0 && (
+                <div class="p-6 text-sm text-white/50 border border-dashed border-white/10">
+                    还没有友链，把你的朋友们加到 <code class="px-1 bg-black/20 rounded">src/data/friends/</code> 目录下即可显示。
+                </div>
+            )}
             {friends.map((friend) => (
                 <a href={friend.url} target="_blank" class="friend-card block p-4 hover:bg-white/5 transition border-b border-white/10 last:border-b-0">
                     <div class="flex items-center gap-2 mb-1">

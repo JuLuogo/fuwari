@@ -1,4 +1,5 @@
 // 文章列表客户端排序（仅当前页面内排序）
+import { viewCounterConfig } from "../config";
 
 interface PostData {
 	id: string;
@@ -39,11 +40,17 @@ class PostListManager {
 	}
 
 	private async loadViewsData() {
+		// 未启用浏览量服务时直接按 0 处理，不发起外部请求
+		const viewsEndpoint = viewCounterConfig.enable
+			? viewCounterConfig.endpoint.replace(/\/+$/, "")
+			: "";
+
 		// 批量获取所有文章的访问量（包含全站访问量）
 		try {
+			if (!viewsEndpoint) throw new Error("view counter disabled");
 			const pathnames = ["/", ...this.posts.map((post) => `/posts/${post.id}/`)];
 			
-			const res = await fetch("https://t.2x.nz/batch", {
+			const res = await fetch(`${viewsEndpoint}/batch`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
