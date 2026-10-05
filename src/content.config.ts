@@ -2,7 +2,9 @@ import { defineCollection, z } from "astro:content";
 import { glob } from "astro/loaders";
 import { parsePostDateToDate } from "./utils/date-utils";
 
-const postsCollection: ReturnType<typeof defineCollection> = defineCollection({
+// 注意：这里不要给集合加 `ReturnType<typeof defineCollection>` 之类的显式标注，
+// 否则会把 schema 类型擦成 unknown，导致 CollectionEntry<"posts">["data"] 全站变成 unknown。
+const postsCollection = defineCollection({
 	loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/posts" }),
 	schema: z.object({
 		title: z.string(),
@@ -24,7 +26,7 @@ const postsCollection: ReturnType<typeof defineCollection> = defineCollection({
 	}),
 });
 
-const specCollection: ReturnType<typeof defineCollection> = defineCollection({
+const specCollection = defineCollection({
 	loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/spec" }),
 	schema: z.object({
 		enable: z.boolean().optional().default(true),
@@ -32,10 +34,9 @@ const specCollection: ReturnType<typeof defineCollection> = defineCollection({
 	}),
 });
 
-export const collections: {
-	posts: typeof postsCollection;
-	spec: typeof specCollection;
-} = {
+// @ts-ignore TS2742：pnpm 隔离的 node_modules 让内联 zod 类型无法被“命名”，
+// 但这里刻意保留类型推断——它决定 CollectionEntry<"posts">["data"] 是否带完整字段类型。
+export const collections = {
 	posts: postsCollection,
 	spec: specCollection,
 };
