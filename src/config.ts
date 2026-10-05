@@ -15,17 +15,23 @@ import type {
 } from "./types/config";
 import { LinkPreset } from "./types/config";
 
-const customDomain = "juluo.work";
+// 根域名：自建服务的子域都挂在它下面（p./t./icon./nat./img. 等）
+const rootDomain = "juluo.work";
+
+// 博客使用二级域名，根域保持空闲（想换成 www 就改这一行）
+const blogSubdomain = "blog";
+const customDomain = `${blogSubdomain}.${rootDomain}`;
 
 // 个人 QQ（头像与联系入口都由它推导，换号只需改这一处）
 const qqNumber = "1576586736";
 const qqAvatar = `https://q2.qlogo.cn/headimg_dl?dst_uin=${qqNumber}&spec=0`;
 
 // TODO: 换成你自己的邮箱地址（当前为占位符）
-const contactEmail = `juluo@${customDomain}`;
+const contactEmail = `juluo@${rootDomain}`;
 
 export const siteConfig: SiteConfig = {
 	customDomain,
+	rootDomain,
 	title: "peroe 的博客",
 	subtitle: "juluo",
 	description:
@@ -142,8 +148,8 @@ export const licenseConfig: LicenseConfig = {
 
 export const imageFallbackConfig: ImageFallbackConfig = {
 	enable: false,
-	originalDomain: `https://p.${customDomain}`,
-	fallbackDomain: `https://p.${customDomain}`,
+	originalDomain: `https://p.${rootDomain}`,
+	fallbackDomain: `https://p.${rootDomain}`,
 };
 
 // Umami 统计（Umami Cloud 美国区）
@@ -208,7 +214,7 @@ export const giscusConfig: GiscusConfig = {
 // OneDrive / 对象存储文件索引（工具页的 OneDrive 标签页）：自建后填写
 export const oneDriveConfig: OneDriveConfig = {
 	enable: false,
-	apiBase: `https://e3.${customDomain}/api/`,
+	apiBase: `https://e3.${rootDomain}/api/`,
 };
 
 export const gitHubEditConfig: GitHubEditConfig = {

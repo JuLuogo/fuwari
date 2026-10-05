@@ -208,7 +208,7 @@ export default defineConfig({
 			alias: [],
 		},
 		server: {
-			allowedHosts: [siteConfig.customDomain],
+			allowedHosts: [siteConfig.customDomain, siteConfig.rootDomain],
 		},
 		build: {
 			rollupOptions: {

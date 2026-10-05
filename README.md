@@ -2,7 +2,7 @@
 
 基于 [Fuwari](https://github.com/saicaca/fuwari) 二次开发的个人博客。
 
-- 站点：<https://juluo.work>
+- 站点：<https://blog.juluo.work>（根域 `juluo.work` 保留给自建服务与跳转）
 - 仓库：<https://github.com/juluogo/fuwari>
 - 上游定制版：[afoim/fuwari](https://github.com/afoim/fuwari)
 

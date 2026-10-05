@@ -40,7 +40,8 @@ export type SiteConfig = {
 		url: string;
 		text: string;
 	}[];
-	customDomain: string; // 统一管理的自定义域名，例如 juluo.work
+	customDomain: string; // 博客域名（二级域名），例如 blog.juluo.work
+	rootDomain: string; // 根域名，自建服务子域挂在它下面，例如 juluo.work
 };
 
 export type Favicon = {

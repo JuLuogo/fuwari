@@ -1,13 +1,14 @@
 # Cloudflare 自建服务部署方案
 
-站点主域：`juluo.work`（apex 直接作为博客域名，`www` 建议 301 到 apex）。
+站点域名：博客跑在二级域名 **`blog.juluo.work`**；根域 `juluo.work` 与 `www.juluo.work` 只做 301 跳转到博客，不直接承载站点（自建服务用 `p.` / `t.` / `icon.` / `nat.` / `img.` / `e3.` 等子域）。
 以下服务全部来自原站（afoim）的自建依赖，现已改为在**你自己的 Cloudflare 账号**上重建。
 
 ## 一、子域与源码对照
 
 | 子域 | 用途 | 源码 | 部署形态 |
 | --- | --- | --- | --- |
-| `juluo.work` | 博客本体 | 本仓库 | Cloudflare Pages（构建命令 `pnpm build`，输出 `dist`） |
+| `blog.juluo.work` | 博客本体 | 本仓库 | Cloudflare Pages（构建命令 `pnpm build`，输出 `dist`） |
+| `juluo.work` / `www.juluo.work` | 仅 301 跳转到博客 | 无（Redirect Rule） | Zone 规则 |
 | `p.juluo.work` | 随机图 API（`/ri/h/{n}.webp`、`/ri/v/...`、`/count.json`） | [JuLuogo/Static_RandomPicAPI](https://github.com/JuLuogo/Static_RandomPicAPI)（fork） | Pages（先跑 `node build.js` 生成 `dist/`） |
 | `img.juluo.work` | 文章配图 / 图床 | 无（R2 公开桶 + 自定义域） | R2 bucket + 自定义域 |
 | `t.juluo.work` | 访问量统计（`tracker.js`、`/share`、`/batch`） | [JuLuogo/cf-umami](https://github.com/JuLuogo/cf-umami)（fork） | Workers + D1 |

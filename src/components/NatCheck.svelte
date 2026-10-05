@@ -178,7 +178,7 @@ async function startTest() {
 
 		// Server performs active probes
 		// 默认后端 Python 代码 API 运行在 8080 端口，若使用了反向代理可移除 :8080
-		const apiUrl = `https://nat.${siteConfig.customDomain}/api/analyze`;
+		const apiUrl = `https://nat.${siteConfig.rootDomain}/api/analyze`;
 		const res = await fetch(apiUrl, {
 			method: "POST",
 			body: JSON.stringify(data),
