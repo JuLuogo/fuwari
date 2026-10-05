@@ -49,6 +49,9 @@ scripts/__pycache__/
 .claude/
 .claude-temp/
 
+# Agent 约束 / 工作记录（只保留在本地，不进入版本控制）
+AGENTS.md
+
 # Spec workflow local artifacts
 .spec-workflow/
 
