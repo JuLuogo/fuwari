@@ -1,5 +1,4 @@
-﻿---
-import { url, pathsEqual } from "@/utils/url-utils";
+---
 import Footer from "@components/Footer.astro";
 import Navbar from "@components/Navbar.astro";
 import BackToTop from "@components/control/BackToTop.astro";
@@ -43,10 +42,6 @@ const hasBannerLink = !!siteConfig.banner.credit.url;
 const mainPanelTop = siteConfig.banner.enable
 	? `calc(${BANNER_HEIGHT}vh - ${MAIN_PANEL_OVERLAPS_BANNER_HEIGHT}rem - 4.5rem)`
 	: "1rem";
-const forumBasePath = url("/forum/");
-const isForumRoute =
-	pathsEqual(Astro.url.pathname, forumBasePath) ||
-	Astro.url.pathname.startsWith(forumBasePath);
 ---
 
 <Layout title={title} banner={banner} description={description} lang={lang} setOGTypeArticle={setOGTypeArticle} ogImage={ogImage}>
@@ -71,9 +66,7 @@ const isForumRoute =
 <div class="relative w-full z-30 pointer-events-none" style=`margin-top: ${mainPanelTop}`>
     <!-- The pointer-events-none here prevent blocking the click event of the TOC -->
     <div class="relative max-w-[var(--page-width)] mx-auto pointer-events-auto">
-        <div id="main-grid" class:list={["w-full left-0 right-0 grid grid-cols-1 grid-rows-[auto_auto_auto] mx-auto gap-4 px-0 md:px-4",
-            {"md:grid-cols-[17.5rem_auto] lg:grid-rows-[auto_1fr] md:grid-rows-[auto_1fr]": !isForumRoute}]}
-        >
+        <div id="main-grid" class="w-full left-0 right-0 grid grid-cols-1 grid-rows-[auto_auto_auto] mx-auto gap-4 px-0 md:px-4 md:grid-cols-[17.5rem_auto] lg:grid-rows-[auto_1fr] md:grid-rows-[auto_1fr]">
             <!-- Banner image credit -->
             {hasBannerCredit && <a href={siteConfig.banner.credit.url} id="banner-credit" target="_blank" rel="noopener" aria-label="Visit image source"
                                    class:list={["group absolute flex justify-center items-center rounded-full " +
@@ -87,14 +80,13 @@ const isForumRoute =
                 </Icon>
             </a>}
 
-            <div id="sidebar" class:list={["mb-4 row-start-2 col-span-1 lg:row-span-2 lg:row-start-1 lg:col-span-1 md:row-span-2 md:row-start-1 md:col-span-1 lg:max-w-[17.5rem] md:max-w-[17.5rem] relative", {"hidden": isForumRoute}]} data-forum-base-path={forumBasePath}>
+            <div id="sidebar" class="mb-4 row-start-2 col-span-1 lg:row-span-2 lg:row-start-1 lg:col-span-1 md:row-span-2 md:row-start-1 md:col-span-1 lg:max-w-[17.5rem] md:max-w-[17.5rem] relative">
                 <div id="sidebar-content" transition:persist>
                     <SideBar headings={headings}></SideBar>
                 </div>
             </div>
 
-            <main id="main-content" class:list={["row-start-1 col-span-1 overflow-visible min-w-0",
-                {"lg:row-start-1 lg:col-start-2 lg:col-span-1 md:row-start-1 md:col-start-2 md:col-span-1": !isForumRoute}]}>
+            <main id="main-content" class="row-start-1 col-span-1 overflow-visible min-w-0 lg:row-start-1 lg:col-start-2 lg:col-span-1 md:row-start-1 md:col-start-2 md:col-span-1">
                 <div id="content-wrapper">
                     <!-- the overflow-hidden here prevent long text break the layout-->
                     <Announcement></Announcement>
@@ -108,8 +100,7 @@ const isForumRoute =
                 </div>
             </main>
 
-            <div id="footer" class:list={["footer col-span-1 row-start-3",
-                {"lg:col-span-1 lg:col-start-2 lg:row-start-2 md:col-span-1 md:col-start-2 md:row-start-2": !isForumRoute}]}>
+            <div id="footer" class="footer col-span-1 row-start-3 lg:col-span-1 lg:col-start-2 lg:row-start-2 md:col-span-1 md:col-start-2 md:row-start-2">
                 <Footer></Footer>
             </div>
         </div>

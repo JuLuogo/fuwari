@@ -7,7 +7,6 @@ Disallow: /*/
 Allow: /posts/
 Allow: /archive/
 Allow: /friends/
-Allow: /forum/
 Allow: /gallery/
 Allow: /sponsors/
 Allow: /cover/

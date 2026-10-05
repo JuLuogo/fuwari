@@ -45,75 +45,6 @@ function showBanner() {
 	banner.classList.remove("opacity-0", "scale-105");
 }
 
-function syncSidebarProfileMode() {
-	const sidebar = document.getElementById("sidebar");
-	const blogProfile = document.getElementById("sidebar-profile-blog");
-	const forumProfile = document.getElementById("sidebar-profile-forum");
-	const timetable = document.getElementById("sidebar-timetable");
-	const deepwiki = document.getElementById("sidebar-deepwiki");
-	const mainGrid = document.getElementById("main-grid");
-	const mainContent = document.getElementById("main-content");
-	const footer = document.getElementById("footer");
-
-	if (!sidebar) return;
-
-	const forumBasePath =
-		sidebar.getAttribute("data-forum-base-path") || "/forum/";
-	const currentPath = window.location.pathname;
-	const normalizedCurrentPath = currentPath.endsWith("/")
-		? currentPath
-		: `${currentPath}/`;
-	const normalizedForumBasePath = forumBasePath.endsWith("/")
-		? forumBasePath
-		: `${forumBasePath}/`;
-	const isForumRoute =
-		normalizedCurrentPath === normalizedForumBasePath ||
-		normalizedCurrentPath.startsWith(normalizedForumBasePath);
-
-	// 控制整个 sidebar 的显示/隐藏
-	sidebar.classList.toggle("hidden", isForumRoute);
-
-	// 同步 main-grid 的 grid 布局类（服务端根据 isForumRoute 渲染，客户端导航后需要同步）
-	if (mainGrid) {
-		const gridCols = "md:grid-cols-[17.5rem_auto]";
-		const lgRows = "lg:grid-rows-[auto_1fr]";
-		const mdRows = "md:grid-rows-[auto_1fr]";
-		mainGrid.classList.toggle(gridCols, !isForumRoute);
-		mainGrid.classList.toggle(lgRows, !isForumRoute);
-		mainGrid.classList.toggle(mdRows, !isForumRoute);
-	}
-
-	// 同步 main-content 的定位类
-	if (mainContent) {
-		const contentClasses = [
-			"lg:row-start-1", "lg:col-start-2", "lg:col-span-1",
-			"md:row-start-1", "md:col-start-2", "md:col-span-1"
-		];
-		for (const cls of contentClasses) {
-			mainContent.classList.toggle(cls, !isForumRoute);
-		}
-	}
-
-	// 同步 footer 的定位类
-	if (footer) {
-		const footerClasses = [
-			"lg:col-span-1", "lg:col-start-2", "lg:row-start-2",
-			"md:col-span-1", "md:col-start-2", "md:row-start-2"
-		];
-		for (const cls of footerClasses) {
-			footer.classList.toggle(cls, !isForumRoute);
-		}
-	}
-
-	// 如果有博客/论坛 profile 切换，也保留原有逻辑
-	if (blogProfile && forumProfile) {
-		blogProfile.classList.toggle("hidden", isForumRoute);
-		forumProfile.classList.toggle("hidden", !isForumRoute);
-	}
-	timetable?.classList.toggle("hidden", isForumRoute);
-	deepwiki?.classList.toggle("hidden", isForumRoute);
-}
-
 function loadProfileStats() {
 	const viewsElement = document.getElementById("site-views");
 	const wrapper = document.getElementById("site-views-wrapper");
@@ -142,7 +73,6 @@ function loadProfileStats() {
 
 function init() {
 	showBanner();
-	syncSidebarProfileMode();
 	loadProfileStats();
 
 	new MutationObserver(() => {
@@ -165,7 +95,6 @@ document.addEventListener("DOMContentLoaded", () => {
 	init();
 	bindPostInlineDiff();
 	scrollFunction();
-	syncSidebarProfileMode();
 });
 
 let backToTopBtn = document.getElementById("back-to-top-btn");
@@ -246,11 +175,9 @@ window.onscroll = () => {
 if (document.readyState === "loading") {
 	document.addEventListener("DOMContentLoaded", () => {
 		scrollFunction();
-		syncSidebarProfileMode();
 	});
 } else {
 	scrollFunction();
-	syncSidebarProfileMode();
 }
 
 window.onresize = () => {

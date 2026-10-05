@@ -126,15 +126,6 @@
     .btn-regular-dark.success {
         @apply bg-[oklch(0.75_0.14_var(--hue))]
     }
-
-    .forum-select {
-        @apply bg-[rgb(18_22_30_/_0.92)] border-white/10;
-        color: rgb(255 255 255 / 0.9);
-    }
-    .forum-select option {
-        background: rgb(18 22 30);
-        color: rgb(255 255 255 / 0.92);
-    }
 }
 
 html {

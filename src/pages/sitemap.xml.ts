@@ -17,7 +17,6 @@ export const GET: APIRoute = async () => {
 		{ url: "/", priority: 1.0, changefreq: "daily" },
 		{ url: "/archive/", priority: 0.8, changefreq: "weekly" },
 		{ url: "/friends/", priority: 0.6, changefreq: "monthly" },
-		{ url: "/forum/", priority: 0.7, changefreq: "daily" },
 		{ url: "/gallery/", priority: 0.6, changefreq: "monthly" },
 		{ url: "/sponsors/", priority: 0.5, changefreq: "monthly" },
 		{ url: "/changes/", priority: 0.5, changefreq: "daily" },
