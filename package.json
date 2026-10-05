@@ -16,13 +16,14 @@
 		"clean": "node scripts/clean-unused-images.js",
 		"imgf": "node scripts/imgf.js",
 		"del-space": "node scripts/del-space.js",
-		"update-diff": "node scripts/update-diff.js",
+		"update-diff": "node scripts/update-diff.js && node scripts/generate-icon-subset.mjs",
 		"lock-post": "node scripts/lock-post.mjs",
 		"watermark": "node scripts/add-watermark.js",
 		"ai-summary": "node scripts/generate-ai-summary.js",
 		"format": "biome format --write ./src",
 		"lint": "biome check --write ./src",
-		"postinstall": "patch-package"
+		"postinstall": "patch-package",
+		"icon-subset": "node scripts/generate-icon-subset.mjs"
 	},
 	"dependencies": {
 		"@astrojs/check": "^0.9.8",
