@@ -89,4 +89,4 @@ export const oneDriveConfig: OneDriveConfig = {
 - [x] `https://t.juluo.work/share?pathname=/` 返回 `{"pathname":"/","views":N}`
 - [x] `https://icon.juluo.work/?url=https://astro.build` 返回 JSON
 - [x] `https://pic.060730.xyz/ri/h/1.webp` 与 `/ri/v/1.webp` 返回图片
-- [ ] 推送到 `main` 后 GitHub Actions 自动部署成功（见 workers-deploy.md）
+- [ ] 在 Cloudflare 控制台把 Worker `peroe-blog` 连到 `juluowork/fuwari`（构建由 Cloudflare 负责，见 workers-deploy.md）
