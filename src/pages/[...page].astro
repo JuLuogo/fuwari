@@ -20,12 +20,15 @@ const pagePostsData = page.data.map(entry => {
 	const data = entry.data as {
 		title: string;
 		published: Date;
+		updated?: Date;
 		pinned?: boolean;
 	};
 	return {
 		id: entry.id,
 		title: data.title,
 		published: data.published.toISOString(),
+		// 客户端排序键要和 getSortedPosts() 一致：改过的文章按 updated 提前
+		updated: data.updated ? data.updated.toISOString() : undefined,
 		pinned: data.pinned,
 	};
 });

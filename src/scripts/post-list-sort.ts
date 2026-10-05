@@ -5,6 +5,8 @@ interface PostData {
 	id: string;
 	title: string;
 	published: string;
+	/** 有更新时间的文章按它排序，会浮到前面（服务端 getSortedPosts 用同一套口径） */
+	updated?: string;
 	pinned?: boolean;
 }
 
@@ -115,8 +117,9 @@ class PostListManager {
 				if (a.pinned !== b.pinned) {
 					return a.pinned ? -1 : 1;
 				}
-				const dateA = new Date(a.published).getTime();
-				const dateB = new Date(b.published).getTime();
+				// 有更新时间的按更新时间排（改过的文章浮到前面），否则用发布时间
+				const dateA = new Date(a.updated ?? a.published).getTime();
+				const dateB = new Date(b.updated ?? b.published).getTime();
 				return this.currentOrder === "desc" ? dateB - dateA : dateA - dateB;
 			} else if (this.currentSort === "views") {
 				const viewsA = this.viewsData.get(a.id) || 0;

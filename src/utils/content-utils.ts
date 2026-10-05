@@ -10,9 +10,11 @@ export async function getSortedPosts(): Promise<CollectionEntry<"posts">[]> {
 		if (a.data.pinned !== b.data.pinned) {
 			return a.data.pinned ? -1 : 1;
 		}
-		// 都是置顶或都不是置顶，按发布日期时间排序（包含小时分钟秒）
-		const dateA = new Date(a.data.published);
-		const dateB = new Date(b.data.published);
+		// 都是置顶或都不是置顶，按「最后更新时间」排（包含小时分钟秒）：
+		// 改过的文章会浮到列表最前面，没改过的就用发布时间——和卡片上显示的日期一致。
+		// ⚠️ 改文章时要把 frontmatter 的 updated 一起改（带 +08:00），否则它不会提前。
+		const dateA = new Date(a.data.updated ?? a.data.published);
+		const dateB = new Date(b.data.updated ?? b.data.published);
 		return dateA > dateB ? -1 : 1;
 	});
 

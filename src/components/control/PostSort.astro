@@ -1,4 +1,4 @@
-﻿---
+---
 import Icon from "@components/Icon.astro";
 
 interface Props {
@@ -12,7 +12,7 @@ const { class: className, style } = Astro.props;
     <div class="flex bg-[var(--card-bg)] p-1 shadow-sm border border-white/10">
         <button data-sort-type="date"
            class="sort-btn active" 
-           title="按发布日期排序">
+           title="按最后更新排序（改过的文章排前面）">
             <Icon name="material-symbols:schedule-outline-rounded" class="text-xl"></Icon>
         </button>
         <button data-sort-type="views"
