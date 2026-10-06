@@ -39,9 +39,21 @@ const clarityId = analyticsConfig.enable ? (analyticsConfig.clarityProjectId ?? 
 
 	const baseConfig = {
 		notice_banner_type: "simple",
-		consent_type: "express",
+		// ⚠️ express = 必须主动同意（功能性/追踪/广告默认全关）；
+		//    implied = 默认同意 / opt-out（必要的永远开，功能性/追踪/广告默认开着，
+		//    访客可以在偏好中心里手动关掉）。
+		consent_type: "implied",
 		language: cookieConsentConfig.language || "en",
-		page_load_consent_levels: ["strictly-necessary"],
+		// ⚠️ 这个列表同时决定「哪些类别算默认已接受」：implied 模式下库会把列在这里的类别
+		//    标记为 accepted（cookie 里写 true、偏好中心开关预勾选）。本站的统计脚本确实是
+		//    页面加载就跑（不等待同意），所以四个类别全列 —— 只列 strictly-necessary 的话，
+		//    访客打开偏好中心会看到功能性/追踪/广告全是关的，与「默认开启」的定位不符。
+		page_load_consent_levels: [
+			"strictly-necessary",
+			"functionality",
+			"tracking",
+			"targeting",
+		],
 		notice_banner_reject_button_hide: false,
 		preferences_center_close_button_hide: false,
 		page_refresh_confirmation_buttons: false,
