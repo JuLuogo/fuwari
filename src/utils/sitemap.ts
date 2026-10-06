@@ -83,24 +83,43 @@ export async function buildSitemapXml(site: string | URL): Promise<string> {
 
 	const allPages: SitemapPage[] = [...staticPages, ...postPages];
 
-	return `<?xml version="1.0" encoding="UTF-8"?>
+	const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${allPages
 	.map((page) => {
-		const loc = `	<loc>${new URL(page.url, site).href}</loc>`;
-		const priority = `	<priority>${page.priority}</priority>`;
-		const changefreq = `	<changefreq>${page.changefreq}</changefreq>`;
-		const lastmod = page.lastmod
-			? `	<lastmod>${new Date(page.lastmod).toISOString().split("T")[0]}</lastmod>`
-			: "";
-		return `	<url>
-${loc}
-${priority}
-${changefreq}${lastmod ? `\n${lastmod}` : ""}
-	</url>`;
+		// ⚠️⚠️ 元素顺序必须严格按官方 XSD 里的 <xsd:sequence>：
+		//     loc → lastmod → changefreq → priority
+		//     写成「看着更顺」的 loc → priority → changefreq 时，XML 依然 well-formed，
+		//     但**不符合 XSD**，Google 会报「无法读取此站点地图」（2026-10-06 踩过：
+		//     线上两条 sitemap 全挂，用官方 XSD 校验才定位到；Bing 宽松所以没事）。
+		//     自检：node 里跑不了 XSD，用 C:\Users\juluo\.dsh-tools\shots\_xsd-check.py（lxml）。
+		const children = [
+			`\t<loc>${new URL(page.url, site).href}</loc>`,
+			page.lastmod
+				? `\t<lastmod>${new Date(page.lastmod).toISOString().split("T")[0]}</lastmod>`
+				: "",
+			`\t<changefreq>${page.changefreq}</changefreq>`,
+			`\t<priority>${page.priority}</priority>`,
+		].filter((line) => line !== "");
+		return `\t<url>\n${children.join("\n")}\n\t</url>`;
 	})
 	.join("\n")}
 </urlset>`.trim();
+
+	// 构建期兜底自检：确认每条 <url> 的子元素顺序就是 XSD 要求的那个（防以后再被"整理"坏）
+	for (const block of xml.match(/<url>[\s\S]*?<\/url>/g) ?? []) {
+		const order = [...block.matchAll(/<(loc|lastmod|changefreq|priority)>/g)].map((m) => m[1]);
+		const expected = ["loc", "lastmod", "changefreq", "priority"].filter((tag) =>
+			order.includes(tag),
+		);
+		if (order.join(",") !== expected.join(",")) {
+			console.warn(
+				`[sitemap] <url> 子元素顺序不符合官方 XSD：${order.join(" → ")}（应为 ${expected.join(" → ")}）—— Google 会报「无法读取此站点地图」`,
+			);
+		}
+	}
+
+	return xml;
 }
 
 export const SITEMAP_HEADERS = {
