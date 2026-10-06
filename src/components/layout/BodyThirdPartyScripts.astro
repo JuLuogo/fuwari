@@ -1,5 +1,11 @@
 ---
 import { analyticsConfig, cookieConsentConfig, umamiConfig, viewCounterConfig } from "@/config";
+
+// GA4 / Clarity 的加载时机："none" 直接加载（当前取值），"tracking" 等横幅同意后再加载
+const analyticsConsentLevel = analyticsConfig.consentLevel ?? "none";
+const analyticsGated = analyticsConsentLevel === "tracking";
+const gaId = analyticsConfig.enable ? (analyticsConfig.gaMeasurementId ?? "") : "";
+const clarityId = analyticsConfig.enable ? (analyticsConfig.clarityProjectId ?? "") : "";
 ---
 
 <script type="text/javascript">
@@ -192,23 +198,43 @@ import { analyticsConfig, cookieConsentConfig, umamiConfig, viewCounterConfig } 
 )}
 
 <!-- 第三方统计：Google Analytics 4 与 Microsoft Clarity（配置见 src/config.ts 的 analyticsConfig）
-     两个都归入「跟踪」类：渲染出来是 type="text/plain" + data-cookie-consent="tracking"，
-     TermsFeed 横幅在用户同意后才把 type 换回 text/javascript 并执行——所以不同意就完全不加载。
-     ⚠️ 依赖上面那段横幅脚本能跑起来（见它的注释），否则这两个永远不会执行。 -->
-{analyticsConfig.enable && analyticsConfig.gaMeasurementId && (
+     默认（consentLevel: "none"）**页面一打开就加载**，和 Umami、自建计数一致。
+     尊重「拒绝」用两层保险：
+       ① 页面加载前先读一次 cookie_consent_level —— 访客明确拒绝过「跟踪」的，
+          立刻置 ga-disable，并且不再注入 Clarity（下次访问也直接不注入）；
+       ② 会话内点「拒绝 / 改偏好」时，再由下面那段同步脚本实时下发停用信号。
+     Clarity 的坑：clarity("consent", false) 只对「脚本加载完之后」的调用生效，
+     排在加载前队列里的调用会被忽略 —— 所以第 ① 层是必须的，光靠第 ② 层拦不住。
+     把 analyticsConfig.consentLevel 改成 "tracking"，这两个标签会变成
+     type="text/plain" + data-cookie-consent="tracking"，回到「同意后才加载」。 -->
+{!analyticsGated && (gaId || clarityId) && (
+	<script is:inline define:vars={{ gaId }}>
+	(function () {
+		var denied = false;
+		var m = document.cookie.match(/(?:^|;\s*)cookie_consent_level=([^;]+)/);
+		if (m) {
+			try { denied = !JSON.parse(decodeURIComponent(m[1]))["tracking"]; } catch (e) {}
+		}
+		window.__trackingDenied = denied;
+		if (denied && gaId) window["ga-disable-" + gaId] = true;
+	})();
+	</script>
+)}
+
+{gaId && (
 	<>
 		<script
 			is:inline
-			type="text/plain"
-			data-cookie-consent="tracking"
 			async
-			src={`https://www.googletagmanager.com/gtag/js?id=${analyticsConfig.gaMeasurementId}`}
+			src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+			type={analyticsGated ? "text/plain" : undefined}
+			data-cookie-consent={analyticsGated ? "tracking" : undefined}
 		></script>
 		<script
 			is:inline
-			type="text/plain"
-			data-cookie-consent="tracking"
-			define:vars={{ gaId: analyticsConfig.gaMeasurementId }}
+			define:vars={{ gaId }}
+			type={analyticsGated ? "text/plain" : undefined}
+			data-cookie-consent={analyticsGated ? "tracking" : undefined}
 		>
 			window.dataLayer = window.dataLayer || [];
 			function gtag() { window.dataLayer.push(arguments); }
@@ -218,18 +244,64 @@ import { analyticsConfig, cookieConsentConfig, umamiConfig, viewCounterConfig } 
 	</>
 )}
 
-{analyticsConfig.enable && analyticsConfig.clarityProjectId && (
+{clarityId && (
 	<script
 		is:inline
-		type="text/plain"
-		data-cookie-consent="tracking"
-		define:vars={{ clarityId: analyticsConfig.clarityProjectId }}
+		define:vars={{ clarityId }}
+		type={analyticsGated ? "text/plain" : undefined}
+		data-cookie-consent={analyticsGated ? "tracking" : undefined}
 	>
 		(function (c, l, a, r, i, t, y) {
+			// 访客拒绝过「跟踪」就不注入 Clarity（见上面第 ① 层保险）
+			if (c.__trackingDenied) return;
 			c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments); };
 			t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
 			y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
 		})(window, document, "clarity", "script", clarityId);
+	</script>
+)}
+
+<!-- 会话内改主意时实时开关：读 TermsFeed 写下的 cookie_consent_level.tracking。
+     库本身不派发事件，所以用「点横幅里的按钮 → 隔一拍读 cookie」的方式同步。 -->
+{!analyticsGated && (gaId || clarityId) && (
+	<script is:inline define:vars={{ gaId, clarityId }}>
+	(function () {
+		var readTracking = function () {
+			var m = document.cookie.match(/(?:^|;\s*)cookie_consent_level=([^;]+)/);
+			if (!m) return null;
+			try {
+				return !!JSON.parse(decodeURIComponent(m[1]))["tracking"];
+			} catch (e) {
+				return null;
+			}
+		};
+		var stop = function () {
+			window.__trackingDenied = true;
+			if (gaId) window["ga-disable-" + gaId] = true;
+			if (clarityId && typeof window.clarity === "function") {
+				try { window.clarity("consent", false); } catch (e) {}
+			}
+		};
+		var resume = function () {
+			window.__trackingDenied = false;
+			if (gaId) window["ga-disable-" + gaId] = false;
+			if (clarityId && typeof window.clarity === "function") {
+				try { window.clarity("consent"); } catch (e) {}
+			}
+		};
+		var sync = function () {
+			var tracking = readTracking();
+			if (tracking === null) return; // 用户还没做选择
+			tracking ? resume() : stop();
+		};
+		// 横幅里的按钮点完会写 cookie，隔一拍再读一次
+		document.addEventListener("click", function (event) {
+			var target = event.target;
+			if (!(target instanceof Element)) return;
+			if (!target.closest(".cc-window, .cc_dialog, [class*='termsfeed'], #cc-main")) return;
+			setTimeout(sync, 300);
+		}, true);
+	})();
 	</script>
 )}
 

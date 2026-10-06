@@ -113,10 +113,14 @@ export type ViewCounterConfig = {
 };
 
 /**
- * 第三方统计（GA4 / Clarity）。两个脚本都归入 Cookie 同意的「跟踪」类：
- * 页面渲染时是 type="text/plain" + data-cookie-consent="tracking"，
- * 用户点同意后由 TermsFeed 横幅把 type 换回 text/javascript 再执行。
- * ⚠️ 横幅本身跑不起来（`cookieConsentConfig is not defined`）时，这两个脚本永远不会加载。
+ * 第三方统计（GA4 / Clarity）。
+ * consentLevel 控制加载时机：
+ *   "none"（本站当前取值）—— 页面一打开就加载，和 Umami、自建计数一致；用户在横幅里选择
+ *                            「拒绝」后，会下发停用信号（GA 的 ga-disable-<ID>、Clarity 的
+ *                            consent(false)）立即停止后续采集。
+ *   "tracking"            —— 渲染成 type="text/plain" + data-cookie-consent="tracking"，
+ *                            等用户同意「跟踪」类之后才由 TermsFeed 横幅激活。
+ * ⚠️ 无论哪种模式都依赖横幅脚本能跑起来（见 BodyThirdPartyScripts.astro 的注释）。
  */
 export type AnalyticsConfig = {
 	enable: boolean;
@@ -124,6 +128,8 @@ export type AnalyticsConfig = {
 	gaMeasurementId?: string;
 	/** Microsoft Clarity 的项目 ID；留空不加载 Clarity */
 	clarityProjectId?: string;
+	/** 加载时机，默认 "none"（立即加载） */
+	consentLevel?: "none" | "tracking";
 };
 
 export type RandomImageConfig = {

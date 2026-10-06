@@ -183,14 +183,19 @@ export const viewCounterConfig: ViewCounterConfig = {
 	preferUmami: true,
 };
 
-// 第三方统计：两个都归入 Cookie 同意的「跟踪」类，用户同意后才加载（见 components/layout/BodyThirdPartyScripts.astro）
+// 第三方统计：GA4 与 Clarity
 //   GA4 后台：https://analytics.google.com → 管理 → 数据流 → 衡量 ID（G- 开头）
 //   Clarity 后台：https://clarity.microsoft.com → 项目 → 设置 → 项目 ID
-// 留空就不加载对应的那一个；想全关就把 enable 改成 false。
+// consentLevel：
+//   "none"（当前）—— 页面一打开就加载，和 Umami、自建计数一致；用户在横幅里点「拒绝」后
+//                    立即下发停用信号（GA 的 ga-disable、Clarity 的 consent(false)）停止采集。
+//   "tracking"    —— 恢复成「同意后才加载」（type="text/plain" + data-cookie-consent="tracking"）。
+// 留空某个 ID 就不加载对应的那一个；想全关就把 enable 改成 false。
 export const analyticsConfig: AnalyticsConfig = {
 	enable: true,
 	gaMeasurementId: "G-C3WKKH0NPV",
 	clarityProjectId: "yt84gx96hg",
+	consentLevel: "none",
 };
 
 // 随机图 API：使用现成的静态随机图服务（图片全在边缘节点，不占本站请求额度）
