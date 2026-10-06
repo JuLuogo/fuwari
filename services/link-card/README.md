@@ -6,7 +6,7 @@
 ## 接口
 
 ```
-GET https://icon.juluo.work/?url=https://example.com
+GET https://icon.peroe.cn/?url=https://example.com
 ```
 
 返回：
@@ -39,6 +39,6 @@ wrangler deploy
 ```ts
 export const linkCardApiConfig: LinkCardApiConfig = {
 	enable: true,
-	baseUrl: "https://icon.juluo.work",
+	baseUrl: "https://icon.peroe.cn",
 };
 ```

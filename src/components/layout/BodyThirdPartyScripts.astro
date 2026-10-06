@@ -175,7 +175,7 @@ const clarityId = analyticsConfig.enable ? (analyticsConfig.clarityProjectId ?? 
 })();
 </script>
 
-<!-- 浏览量上报（自建服务 t.juluo.work，见 src/config.ts 的 viewCounterConfig）
+<!-- 浏览量上报（自建服务 t.peroe.cn，见 src/config.ts 的 viewCounterConfig）
      tracker.js 在每次页面浏览时按 location.pathname 向 /send 报一次；它只记路径计数，
      不带 Cookie、不传 UA/IP，所以和 Umami 一样不受 Cookie 同意横幅拦截。
      ⚠️ 这里只负责「写」：不引它的话 D1 里永远是空的，前台所有数字都会是 0。

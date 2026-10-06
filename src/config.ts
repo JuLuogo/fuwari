@@ -18,9 +18,10 @@ import type {
 import { LinkPreset } from "./types/config";
 
 // 根域名：自建服务的子域都挂在它下面（p./t./icon./nat./img. 等）
-const rootDomain = "juluo.work";
+// 2026-10-06 换域：juluo.work → peroe.cn（旧域保留并 301 到新域，见 AGENTS.md §16）
+const rootDomain = "peroe.cn";
 
-// 博客使用二级域名，根域保持空闲（想换成 www 就改这一行）
+// 博客使用二级域名，根域留给官网（想换成 www 就改这一行）
 const blogSubdomain = "blog";
 const customDomain = `${blogSubdomain}.${rootDomain}`;
 
@@ -28,8 +29,10 @@ const customDomain = `${blogSubdomain}.${rootDomain}`;
 const qqNumber = "1576586736";
 const qqAvatar = `https://q2.qlogo.cn/headimg_dl?dst_uin=${qqNumber}&spec=0`;
 
-// TODO: 换成你自己的邮箱地址（当前为占位符）
-const contactEmail = `juluo@${rootDomain}`;
+// 联系邮箱：**写死**，不要跟着 rootDomain 变 ——
+// peroe.cn 没有 MX 记录（邮箱在 juluo.work 上，route1-3.mx.cloudflare.net），
+// 写成 juluo@peroe.cn 会收不到信。
+const contactEmail = "juluo@juluo.work";
 
 export const siteConfig: SiteConfig = {
 	customDomain,
@@ -43,7 +46,7 @@ export const siteConfig: SiteConfig = {
 		"peroe",
 		"peroe 的博客",
 		"juluo",
-		"juluo.work",
+		"peroe.cn",
 		"个人博客",
 		"技术博客",
 		"Blog",
@@ -176,10 +179,10 @@ export const umamiConfig: UmamiConfig = {
 };
 
 // 文章/页面浏览量：优先读 Umami（它从建站起就在记，数据是连续的），
-// 自建 Worker + D1（t.juluo.work）作为兜底——Umami 接口失败或查不到这个路径时才会用到。
+// 自建 Worker + D1（t.peroe.cn）作为兜底——Umami 接口失败或查不到这个路径时才会用到。
 export const viewCounterConfig: ViewCounterConfig = {
 	enable: true,
-	endpoint: "https://t.juluo.work",
+	endpoint: "https://t.peroe.cn",
 	preferUmami: true,
 };
 
@@ -208,10 +211,10 @@ export const randomImageConfig: RandomImageConfig = {
 	maxVertical: 3596, // 实测 /ri/v/{n}.webp 的最大 n
 };
 
-// 链接卡片（::url{}）的元数据 API：自建 Worker 部署在 icon.juluo.work（代码见 services/link-card）
+// 链接卡片（::url{}）的元数据 API：自建 Worker 部署在 icon.peroe.cn（代码见 services/link-card）
 export const linkCardApiConfig: LinkCardApiConfig = {
 	enable: true,
-	baseUrl: "https://icon.juluo.work",
+	baseUrl: "https://icon.peroe.cn",
 };
 
 // Cookie 同意（TermsFeed 免费版）：站点名与隐私政策地址会显示在横幅里

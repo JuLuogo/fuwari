@@ -1,7 +1,7 @@
 # 部署方式（Cloudflare 构建）
 
 - 仓库：<https://github.com/juluowork/fuwari>（`main` 分支）
-- Worker：`peroe-blog`，自定义域 <https://blog.juluo.work>
+- Worker：`peroe-blog`，自定义域 <https://blog.peroe.cn>
 - **构建与部署全部由 Cloudflare Workers Builds 负责**，GitHub 侧不再跑构建
   （`.github/workflows/deploy-workers.yml` 与 `dist` 产物分支均已删除）。
 
@@ -48,8 +48,8 @@ npx wrangler deploy     # 部署 Worker `peroe-blog`
 其他服务：
 
 ```powershell
-cd services/link-card ; npx wrangler deploy   # icon.juluo.work
-# 访问量统计代码在 https://github.com/juluowork/cf-umami（t.juluo.work）
+cd services/link-card ; npx wrangler deploy   # icon.peroe.cn
+# 访问量统计代码在 https://github.com/juluowork/cf-umami（t.peroe.cn）
 ```
 
 ## 三、注意事项

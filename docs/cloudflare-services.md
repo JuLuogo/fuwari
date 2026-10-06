@@ -1,6 +1,7 @@
 # Cloudflare 服务清单与现状
 
-站点域名：博客跑在 **`blog.juluo.work`**；根域 `juluo.work` 与 `www.juluo.work` 只做 301 跳转到博客。
+站点域名：博客跑在 **`blog.peroe.cn`**（`peroe.cn` 的 NS 在 Cloudflare）。
+旧域 `juluo.work` / `www.juluo.work` / `blog.juluo.work` 已全部 **301 跳转到新域**（跳转规则在 juluo.work zone）。
 全部服务都部署在 **Cloudflare Workers** 上（不用 Pages）。
 
 > 部署命令与 GitHub 自动构建见 [workers-deploy.md](./workers-deploy.md)。
@@ -9,10 +10,10 @@
 
 | 子域 | 用途 | 实现 | 状态 |
 | --- | --- | --- | --- |
-| `blog.juluo.work` | 博客本体 | Worker `peroe-blog`（静态资源模式，`assets.directory = ./dist`） | ✅ |
-| `juluo.work` / `www.juluo.work` | 301 → 博客 | Zone 动态跳转规则 | ✅ |
-| `t.juluo.work` | 访问量统计 | Worker `cf-umami` + D1 `cf-umami`（fork: [juluowork/cf-umami](https://github.com/juluowork/cf-umami)，已修 `/share` 的 CORS） | ✅ |
-| `icon.juluo.work` | 链接卡片元数据 `?url=` | Worker `link-card`，代码在 `services/link-card/` | ✅ |
+| `blog.peroe.cn` | 博客本体 | Worker `peroe-blog`（静态资源模式，`assets.directory = ./dist`） | ✅ |
+| `juluo.work` / `www` / `blog.juluo.work` | 301 → `blog.peroe.cn` | juluo.work zone 动态跳转规则 | ✅ |
+| `t.peroe.cn` | 访问量统计 | Worker `cf-umami` + D1 `cf-umami`（fork: [juluowork/cf-umami](https://github.com/juluowork/cf-umami)，已修 `/share` 的 CORS） | ✅ |
+| `icon.peroe.cn` | 链接卡片元数据 `?url=` | Worker `link-card`，代码在 `services/link-card/` | ✅ |
 
 **不使用**的服务（保持站点轻量）：
 
@@ -54,7 +55,7 @@ GET  {gateway}/api/websites/{websiteId}/stats?...&path=eq.%2Fposts%2Fxxx%2F     
 token 缓存在 `sessionStorage`（8 分钟）；401 时丢缓存重取一次，再失败就整体回落自建接口。
 这套接口没有公开文档，参数是照着分享页抓包对出来的——**因此必须有兜底**，别把它当稳定契约。
 
-**自建 `t.juluo.work`**（`viewCounterConfig.endpoint`，兜底）
+**自建 `t.peroe.cn`**（`viewCounterConfig.endpoint`，兜底）
 
 ```
 GET  /share?pathname=/posts/xxx/   -> {"pathname":"/posts/xxx/","views":12}
@@ -66,7 +67,7 @@ POST /send    {"pathname":"/"}     -> 记录一次访问（只接受来自 TRACK
 ⚠️ 只引读取端不引 `tracker.js`，D1 里就永远是空的（本项目曾长期处于这个状态，前台所有数字都是 0）。
 D1 兜底里的 `/` 只是**首页 PV**，不是全站求和；换成 Umami 之后侧栏那个数才是真·全站全时段 PV（`/stats` 不带 path 过滤）。
 
-**链接卡片 `icon.juluo.work`**（`linkCardApiConfig`）
+**链接卡片 `icon.peroe.cn`**（`linkCardApiConfig`）
 
 ```
 GET /?url=https://astro.build
@@ -95,13 +96,13 @@ export const umamiConfig: UmamiConfig = {
 
 export const viewCounterConfig: ViewCounterConfig = {
 	enable: true,
-	endpoint: "https://t.juluo.work", // 兜底：自建统计 Worker + D1
+	endpoint: "https://t.peroe.cn", // 兜底：自建统计 Worker + D1
 	preferUmami: true, // 优先读 Umami 分享接口
 };
 
 export const linkCardApiConfig: LinkCardApiConfig = {
 	enable: true,
-	baseUrl: "https://icon.juluo.work",
+	baseUrl: "https://icon.peroe.cn",
 };
 
 export const randomImageConfig: RandomImageConfig = {
@@ -119,11 +120,11 @@ export const oneDriveConfig: OneDriveConfig = {
 
 ## 四、验证清单
 
-- [x] `https://blog.juluo.work` 首页/`/privacy/`/`/friends/`/`/sponsors/`/`/tools/` 可访问
+- [x] `https://blog.peroe.cn` 首页/`/privacy/`/`/friends/`/`/sponsors/`/`/tools/` 可访问
 - [x] `https://juluo.work` 与 `https://www.juluo.work` 301 跳转到博客
-- [x] `https://t.juluo.work/share?pathname=/` 返回 `{"pathname":"/","views":N}`
+- [x] `https://t.peroe.cn/share?pathname=/` 返回 `{"pathname":"/","views":N}`
 - [x] 每个页面都引了上报脚本并真的发出 `POST /send`（本机 Chrome 实测：首页 `/`、文章页 `/posts/<slug>/`、归档页 `/archive/` 各 1 条）
 - [x] 浏览量优先取 Umami：本机构建实测侧栏显示 Umami 全时段 PV、文章卡片显示各文 PV；把网关掐断后自动回落到 `POST /batch`（用 111 的假数据肉眼确认过）
-- [x] `https://icon.juluo.work/?url=https://astro.build` 返回 JSON
+- [x] `https://icon.peroe.cn/?url=https://astro.build` 返回 JSON
 - [x] `https://pic.060730.xyz/ri/h/1.webp` 与 `/ri/v/1.webp` 返回图片
 - [ ] 在 Cloudflare 控制台把 Worker `peroe-blog` 连到 `juluowork/fuwari`（构建由 Cloudflare 负责，见 workers-deploy.md）

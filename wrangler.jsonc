@@ -12,8 +12,8 @@
 	// 用路由 + 手动 DNS 后，解析记录完全由我们掌控（改优选 IP 只动 DNS，不用重新部署）。
 	"routes": [
 		{
-			"pattern": "blog.juluo.work/*",
-			"zone_name": "juluo.work"
+			"pattern": "blog.peroe.cn/*",
+			"zone_name": "peroe.cn"
 		}
 	]
 }

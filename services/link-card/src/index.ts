@@ -8,7 +8,7 @@
 
 const MAX_HTML_BYTES = 256 * 1024;
 const USER_AGENT =
-	"Mozilla/5.0 (compatible; peroe-link-card/1.0; +https://blog.juluo.work)";
+	"Mozilla/5.0 (compatible; peroe-link-card/1.0; +https://blog.peroe.cn)";
 
 interface Env {
 	/** 允许跨域的来源，逗号分隔；默认博客域名 */
@@ -76,7 +76,7 @@ function isBlockedHost(hostname: string): boolean {
 
 function corsHeaders(request: Request, env: Env): Headers {
 	const headers = new Headers();
-	const allowed = (env.ALLOWED_ORIGINS || "https://blog.juluo.work,https://juluo.work")
+	const allowed = (env.ALLOWED_ORIGINS || "https://blog.peroe.cn,https://peroe.cn,https://blog.juluo.work")
 		.split(",")
 		.map((item) => item.trim())
 		.filter(Boolean);

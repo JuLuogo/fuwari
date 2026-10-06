@@ -1,6 +1,6 @@
 # 文章写作规范
 
-本文件是本站（<https://blog.juluo.work>）所有文章的写作契约。写文章前先通读一遍。
+本文件是本站（<https://blog.peroe.cn>）所有文章的写作契约。写文章前先通读一遍。
 
 ## 一、选题
 
@@ -87,7 +87,7 @@ draft: false                           # 发布即 false
 - 站内互链用 `/posts/<slug>/`；外链直接写完整 URL。
 - 可用的自定义指令：
   - `::github{repo="owner/repo"}` —— GitHub 仓库卡片
-  - `::url{href="https://example.com"}` —— 链接卡片（会去 `icon.juluo.work` 抓元数据）
+  - `::url{href="https://example.com"}` —— 链接卡片（会去 `icon.peroe.cn` 抓元数据）
 - 不要出现「本文由 AI 生成」之类的话；也不要写「如有错误欢迎指正」这种空话结尾。
 
 ## 五、截图工具（本机 Chrome，已装好）
@@ -106,7 +106,7 @@ node shot.mjs --url "https://example.com" --out "D:\shots\01-home.png" `
 # 填表单 + 点按钮 + 等结果（测速类）
 node shot.mjs --url "https://www.tcptest.cn/ping" --out "D:\shots\02-ping.png" `
   --width 1500 --height 1100 --headed --profile "$env:TEMP\chrome-a1" `
-  --fill "input[type=text]" --value "blog.juluo.work" `
+  --fill "input[type=text]" --value "blog.peroe.cn" `
   --click "text=单次测试" --after-click 3000 `
   --wait-for "text=全部节点" --wait-for-timeout 90000 `
   --click2 "text=关闭广告" --hide ".advertisement-banner"
@@ -138,7 +138,7 @@ node render.mjs --html "D:\shots\terminal.html" --out "D:\shots\03-terminal.png"
     <span style="width:12px;height:12px;border-radius:50%;background:#fab387"></span>
     <span style="width:12px;height:12px;border-radius:50%;background:#a6e3a1"></span>
   </div>
-  <div><span style="color:#a6e3a1">$</span> dig +short blog.juluo.work</div>
+  <div><span style="color:#a6e3a1">$</span> dig +short blog.peroe.cn</div>
   <div>104.21.6.247</div>
 </div>
 ```
@@ -160,14 +160,14 @@ node render.mjs --html "D:\shots\terminal.html" --out "D:\shots\03-terminal.png"
 | 用途 | 地址 |
 | --- | --- |
 | 多节点 Ping / Tcping / DNS / 路由追踪 | <https://www.tcptest.cn/ping>、`/tcping`、`/dns`、`/traceroute` |
-| HTTPS 评分 | <https://www.ssllabs.com/ssltest/analyze.html?d=blog.juluo.work> |
-| 安全响应头 | <https://securityheaders.com/?q=blog.juluo.work> |
-| 网页性能 | <https://pagespeed.web.dev/analysis?url=https://blog.juluo.work/> |
-| DNS 传播 | <https://dnschecker.org/#A/blog.juluo.work> |
-| 证书透明度 | <https://crt.sh/?q=juluo.work> |
+| HTTPS 评分 | <https://www.ssllabs.com/ssltest/analyze.html?d=blog.peroe.cn> |
+| 安全响应头 | <https://securityheaders.com/?q=blog.peroe.cn> |
+| 网页性能 | <https://pagespeed.web.dev/analysis?url=https://blog.peroe.cn/> |
+| DNS 传播 | <https://dnschecker.org/#A/blog.peroe.cn> |
+| 证书透明度 | <https://crt.sh/?q=peroe.cn> |
 | Cloudflare 状态 | <https://www.cloudflarestatus.com/> |
 | Cloudflare 测速 | <https://speed.cloudflare.com/> |
-| 自己站点 | <https://blog.juluo.work/> 各页面 |
+| 自己站点 | <https://blog.peroe.cn/> 各页面 |
 
 ## 六、写作完成后必须做的检查
 

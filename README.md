@@ -2,7 +2,7 @@
 
 基于 [Fuwari](https://github.com/saicaca/fuwari) 二次开发的个人技术博客。
 
-- 站点：<https://blog.juluo.work>（根域 `juluo.work` 保留给自建服务与跳转）
+- 站点：<https://blog.peroe.cn>（2026-10-06 从 `blog.juluo.work` 迁来；旧域保留做 301 跳转与备用入口）
 - 仓库：<https://github.com/juluowork/fuwari>
 - 部署：Cloudflare Workers 静态资源模式，由 Cloudflare 从本仓库 `main` 分支构建
 - 写作规范：[`docs/writing-guide.md`](docs/writing-guide.md) ｜ 选题规划：[`docs/topic-plan.md`](docs/topic-plan.md) ｜ 服务清单：[`docs/cloudflare-services.md`](docs/cloudflare-services.md)
@@ -82,7 +82,7 @@ src/content/posts/hello-world.md              ← 你写的 Markdown
 dist/posts/hello-world/index.html             ← 生成的静态网页（部署时上传的就是 dist/）
         │  路由
         ▼
-https://blog.juluo.work/posts/hello-world/    ← 线上地址
+https://blog.peroe.cn/posts/hello-world/    ← 线上地址
 ```
 
 图片放在 `public/` 下会**原样复制**到产物根目录，所以：
@@ -130,7 +130,7 @@ https://blog.juluo.work/posts/hello-world/    ← 线上地址
 │   ├── clean-unused-images.js  del-space.js  cdnify-images.js  check-links.js  imgf.js
 │   └── utils/                  # 脚本公用工具
 ├── services/                   # 随仓库维护的独立 Cloudflare Worker
-│   └── link-card/              # 链接卡片元数据抓取（icon.juluo.work）
+│   └── link-card/              # 链接卡片元数据抓取（icon.peroe.cn）
 ├── docs/                       # 项目文档
 │   ├── writing-guide.md        # 写作规范（frontmatter、结构、配图、截图工具）
 │   ├── topic-plan.md           # 选题规划（60 个选题 / 12 个方向）
@@ -169,7 +169,7 @@ https://blog.juluo.work/posts/hello-world/    ← 线上地址
 
 产物是纯静态文件，由 **Cloudflare Workers（静态资源模式）** 托管：
 
-- 仓库 `wrangler.jsonc` 声明 `assets.directory = ./dist` 与自定义域 `blog.juluo.work`
+- 仓库 `wrangler.jsonc` 声明 `assets.directory = ./dist` 与自定义域 `blog.peroe.cn`
 - Cloudflare 侧 Build command：`pnpm update-diff && pnpm astro build --force`；Deploy command：`npx wrangler deploy`
 - 推送 `main` 分支即自动构建部署；本地也可 `pnpm update-diff && pnpm astro build --force && npx wrangler deploy`
 
