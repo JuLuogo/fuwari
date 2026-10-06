@@ -1,4 +1,5 @@
 import type {
+	AnalyticsConfig,
 	CookieConsentConfig,
 	GitHubEditConfig,
 	GiscusConfig,
@@ -182,6 +183,16 @@ export const viewCounterConfig: ViewCounterConfig = {
 	preferUmami: true,
 };
 
+// 第三方统计：两个都归入 Cookie 同意的「跟踪」类，用户同意后才加载（见 components/layout/BodyThirdPartyScripts.astro）
+//   GA4 后台：https://analytics.google.com → 管理 → 数据流 → 衡量 ID（G- 开头）
+//   Clarity 后台：https://clarity.microsoft.com → 项目 → 设置 → 项目 ID
+// 留空就不加载对应的那一个；想全关就把 enable 改成 false。
+export const analyticsConfig: AnalyticsConfig = {
+	enable: true,
+	gaMeasurementId: "G-C3WKKH0NPV",
+	clarityProjectId: "yt84gx96hg",
+};
+
 // 随机图 API：使用现成的静态随机图服务（图片全在边缘节点，不占本站请求额度）
 // 接口形态：/ri/h/{n}.webp 横屏、/ri/v/{n}.webp 竖屏；max 为 0 时会尝试读 /count.json
 // 若该服务不可用，可换回自建方案：services/random-pic（git 历史里仍保留）
@@ -203,8 +214,10 @@ export const cookieConsentConfig: CookieConsentConfig = {
 	enable: true,
 	siteName: "peroe 的博客",
 	privacyPolicyUrl: `https://${customDomain}/privacy/`,
-	// 语言代码见 TermsFeed i18n，改动前先在浏览器里确认横幅文案正常
-	language: "zh-TW",
+	// ⚠️ TermsFeed 的语言码是「小写 + 下划线」：繁体中文是 `zh_tw`，不是 `zh-TW`。
+	// 写错不会报错，只会静默 fallback 成英文横幅（`isSupportedLanguage()` 判定不支持 → userLang="en"）。
+	// 可选值见库里的语言表（en / zh_tw / tr / oc …），改动后务必在浏览器里看一眼文案。
+	language: "zh_tw",
 };
 
 // Giscus 评论：仓库需开启 Discussions，并在仓库上安装 GitHub App https://github.com/apps/giscus

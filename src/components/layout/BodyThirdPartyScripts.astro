@@ -1,5 +1,5 @@
 ---
-import { cookieConsentConfig, umamiConfig, viewCounterConfig } from "@/config";
+import { analyticsConfig, cookieConsentConfig, umamiConfig, viewCounterConfig } from "@/config";
 ---
 
 <script type="text/javascript">
@@ -20,7 +20,12 @@ import { cookieConsentConfig, umamiConfig, viewCounterConfig } from "@/config";
 	window.addEventListener("load", load, { once: true });
 })();
 </script>
-<script type="text/javascript" charset="UTF-8">
+<!-- ⚠️ 这个脚本必须用 is:inline + define:vars：
+     非 inline 的 <script> 会被 Astro 当模块打包，**拿不到 frontmatter 里的变量**，
+     之前写成 `<script type="text/javascript">` 时这里一执行就抛
+     `cookieConsentConfig is not defined`，整个 IIFE 挂掉 → cc.run() 从没执行 →
+     Cookie 横幅从来没弹过，连带下面 consentLevel=tracking 的第三方脚本也永远不会加载。 -->
+<script is:inline define:vars={{ cookieConsentConfig }}>
 (function () {
 	const getPalette = () => {
 		return "dark";
@@ -184,6 +189,48 @@ import { cookieConsentConfig, umamiConfig, viewCounterConfig } from "@/config";
 		src={`${umamiConfig.baseUrl}/script.js`}
 		data-website-id={umamiConfig.websiteId}
 	></script>
+)}
+
+<!-- 第三方统计：Google Analytics 4 与 Microsoft Clarity（配置见 src/config.ts 的 analyticsConfig）
+     两个都归入「跟踪」类：渲染出来是 type="text/plain" + data-cookie-consent="tracking"，
+     TermsFeed 横幅在用户同意后才把 type 换回 text/javascript 并执行——所以不同意就完全不加载。
+     ⚠️ 依赖上面那段横幅脚本能跑起来（见它的注释），否则这两个永远不会执行。 -->
+{analyticsConfig.enable && analyticsConfig.gaMeasurementId && (
+	<>
+		<script
+			is:inline
+			type="text/plain"
+			data-cookie-consent="tracking"
+			async
+			src={`https://www.googletagmanager.com/gtag/js?id=${analyticsConfig.gaMeasurementId}`}
+		></script>
+		<script
+			is:inline
+			type="text/plain"
+			data-cookie-consent="tracking"
+			define:vars={{ gaId: analyticsConfig.gaMeasurementId }}
+		>
+			window.dataLayer = window.dataLayer || [];
+			function gtag() { window.dataLayer.push(arguments); }
+			gtag("js", new Date());
+			gtag("config", gaId);
+		</script>
+	</>
+)}
+
+{analyticsConfig.enable && analyticsConfig.clarityProjectId && (
+	<script
+		is:inline
+		type="text/plain"
+		data-cookie-consent="tracking"
+		define:vars={{ clarityId: analyticsConfig.clarityProjectId }}
+	>
+		(function (c, l, a, r, i, t, y) {
+			c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments); };
+			t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
+			y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
+		})(window, document, "clarity", "script", clarityId);
+	</script>
 )}
 
 <!-- Browser Update Notification -->

@@ -112,6 +112,20 @@ export type ViewCounterConfig = {
 	preferUmami?: boolean;
 };
 
+/**
+ * 第三方统计（GA4 / Clarity）。两个脚本都归入 Cookie 同意的「跟踪」类：
+ * 页面渲染时是 type="text/plain" + data-cookie-consent="tracking"，
+ * 用户点同意后由 TermsFeed 横幅把 type 换回 text/javascript 再执行。
+ * ⚠️ 横幅本身跑不起来（`cookieConsentConfig is not defined`）时，这两个脚本永远不会加载。
+ */
+export type AnalyticsConfig = {
+	enable: boolean;
+	/** Google Analytics 4 的衡量 ID（G-XXXXXXXXXX）；留空不加载 GA */
+	gaMeasurementId?: string;
+	/** Microsoft Clarity 的项目 ID；留空不加载 Clarity */
+	clarityProjectId?: string;
+};
+
 export type RandomImageConfig = {
 	enable: boolean;
 	baseUrl: string;
