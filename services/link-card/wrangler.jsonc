@@ -8,10 +8,12 @@
 	"vars": {
 		"ALLOWED_ORIGINS": "https://blog.juluo.work,https://juluo.work,http://localhost:4321"
 	},
+	// ⚠️ 与主站保持一致：用 Workers Routes + 手动 DNS，不用自定义域。
+	// （自定义域会自动改写 DNS 记录，覆盖手工维护的优选解析，也易与已有记录冲突。）
 	"routes": [
 		{
-			"pattern": "icon.juluo.work",
-			"custom_domain": true
+			"pattern": "icon.juluo.work/*",
+			"zone_name": "juluo.work"
 		}
 	]
 }

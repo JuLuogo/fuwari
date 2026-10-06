@@ -6,10 +6,14 @@
 		"directory": "./dist",
 		"not_found_handling": "404-page"
 	},
+	// ⚠️ 刻意使用 Workers Routes 而不是自定义域（custom_domain）：
+	// 自定义域会被 Cloudflare 自动接管 DNS 记录（生成 AAAA 100:: 那条），
+	// 覆盖我们手工维护的解析（例如优选 CNAME），也可能与已有记录冲突报 100117。
+	// 用路由 + 手动 DNS 后，解析记录完全由我们掌控（改优选 IP 只动 DNS，不用重新部署）。
 	"routes": [
 		{
-			"pattern": "blog.juluo.work",
-			"custom_domain": true
+			"pattern": "blog.juluo.work/*",
+			"zone_name": "juluo.work"
 		}
 	]
 }
