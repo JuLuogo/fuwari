@@ -1,4 +1,6 @@
 ---
+import { readdirSync } from "node:fs";
+import { join } from "node:path";
 import { siteConfig } from "@/config";
 import type { Sponsor } from "@/types/data";
 import LinkSubmitInfo from "@components/misc/LinkSubmitInfo.astro";
@@ -11,6 +13,25 @@ const sponsors = Object.values(
 		import: "default",
 	}),
 );
+
+// 构建期兜底：这个目录只认**小写 .json**。踩过一次 —— 文件叫 juluo.JSON（大写后缀），
+// 在 Linux 构建机上 glob 匹配不到（Windows 看着像正常），页面静默不显示。
+// 这里扫一遍目录，把「不会被读取的文件」明确告警出来，避免再出现「加了文件但页面没变」。
+try {
+	const ignored = readdirSync(join(process.cwd(), "src", "data", "sponsors"), {
+		withFileTypes: true,
+	})
+		.filter((entry) => entry.isFile() && !entry.name.endsWith(".json") && entry.name !== "README.md")
+		.map((entry) => entry.name);
+	if (ignored.length > 0) {
+		console.warn(
+			`[sponsors] src/data/sponsors 下这些文件不会被读取：${ignored.join("、")} —— ` +
+				"只有小写 .json 结尾的文件才会被加载（大写 .JSON 在 Linux 构建机上匹配不到，详见该目录的 README.md）",
+		);
+	}
+} catch {
+	// 目录不存在就跳过（例如刚 clone 还没建）
+}
 
 const breadcrumbSchema = {
 	"@context": "https://schema.org",
