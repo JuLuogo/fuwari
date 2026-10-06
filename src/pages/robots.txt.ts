@@ -8,10 +8,11 @@ import type { APIRoute } from "astro";
 //    结论：默认全放开，只挡构建产物。要让某个页面不进搜索结果，请用页面里的
 //    <meta name="robots" content="noindex">，不要用 robots.txt —— 被 disallow 的页面
 //    Google 根本读不到那句 noindex，反而会以「被 robots.txt 屏蔽」的形式留在索引里。
+//    另外这里也不要挡 /_astro/：那是本站的 CSS/JS 构建产物，Google 要靠它们把页面
+//    渲染成一个正常的样子；里面没有 HTML 页面，挡了只有坏处没有好处。
 const robotsTxt = `
 User-agent: *
 Allow: /
-Disallow: /_astro/
 
 Sitemap: ${new URL("sitemap.xml", import.meta.env.SITE).href}
 `.trim();
